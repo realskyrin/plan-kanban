@@ -86,7 +86,7 @@ export function CreateTaskDialog({
       setForm({
         title: "",
         description: "",
-        priority: "medium",
+        priority: "low",
       })
       toast({
         title: "成功",

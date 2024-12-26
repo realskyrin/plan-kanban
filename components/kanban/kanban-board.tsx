@@ -73,9 +73,16 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       return
     }
 
-    const updatedTask = {
-      status: destination.droppableId as Task["status"],
-    }
+    const taskToUpdate = tasks.find((task) => task.id === draggableId)
+    if (!taskToUpdate) return
+
+    const updatedTasks = tasks.map((task) =>
+      task.id === draggableId
+        ? { ...task, status: destination.droppableId as Task["status"] }
+        : task
+    )
+    
+    setTasks(updatedTasks)
 
     try {
       const response = await fetch(
@@ -85,17 +92,22 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(updatedTask),
+          body: JSON.stringify({
+            status: destination.droppableId as Task["status"],
+          }),
         }
       )
 
-      if (!response.ok) throw new Error("更新失败")
-
-      const updated = await response.json()
-      setTasks((prev) =>
-        prev.map((task) => (task.id === draggableId ? updated : task))
-      )
+      if (!response.ok) {
+        throw new Error("更新失败")
+      }
     } catch (error) {
+      setTasks((prev) => prev.map((task) =>
+        task.id === draggableId
+          ? { ...task, status: source.droppableId as Task["status"] }
+          : task
+      ))
+      
       toast({
         title: "错误",
         description: "更新任务状态失败",
