@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 interface Task {
-  id: string
+  id: number
   title: string
   description: string
   status: "todo" | "in_progress" | "done"
@@ -84,14 +84,21 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
   const priority = task.priority || "low"
 
   return (
-    <Draggable draggableId={task.id} index={index}>
-      {(provided) => (
+    <Draggable draggableId={String(task.id)} index={index}>
+      {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          className={cn(
+            "touch-none select-none",
+            snapshot.isDragging && "rotate-2"
+          )}
         >
-          <Card>
+          <Card className={cn(
+            "border shadow-sm transition-all",
+            snapshot.isDragging && "shadow-lg"
+          )}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <h4 className="font-semibold">{task.title}</h4>
               <DropdownMenu>

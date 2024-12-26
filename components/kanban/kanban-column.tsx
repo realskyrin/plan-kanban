@@ -9,7 +9,7 @@ import { CreateTaskDialog } from "./create-task-dialog"
 import { cn } from "@/lib/utils"
 
 interface Task {
-  id: string
+  id: number
   title: string
   description: string
   status: "todo" | "in_progress" | "done"
@@ -50,8 +50,8 @@ export function KanbanColumn({ id, title, tasks, projectId, onTaskUpdate }: Kanb
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={cn(
-              "flex-1 p-4 space-y-4 transition-colors",
-              snapshot.isDraggingOver && "border-2 border-dashed border-primary/50 rounded-lg bg-muted/50"
+              "flex-1 p-4 space-y-4 transition-colors min-h-[200px]",
+              snapshot.isDraggingOver && "bg-muted/50 border-2 border-dashed border-primary/50 rounded-lg"
             )}
           >
             {tasks.map((task, index) => (

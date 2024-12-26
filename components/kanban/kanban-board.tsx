@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 
 interface Task {
-  id: string
+  id: number
   title: string
   description: string
   status: "todo" | "in_progress" | "done"
@@ -73,11 +73,11 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       return
     }
 
-    const taskToUpdate = tasks.find((task) => task.id === draggableId)
+    const taskToUpdate = tasks.find((task) => String(task.id) === draggableId)
     if (!taskToUpdate) return
 
     const updatedTasks = tasks.map((task) =>
-      task.id === draggableId
+      String(task.id) === draggableId
         ? { ...task, status: destination.droppableId as Task["status"] }
         : task
     )
@@ -86,7 +86,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/tasks/${draggableId}`,
+        `http://localhost:3001/tasks/${taskToUpdate.id}`,
         {
           method: "PATCH",
           headers: {
@@ -103,7 +103,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       }
     } catch (error) {
       setTasks((prev) => prev.map((task) =>
-        task.id === draggableId
+        String(task.id) === draggableId
           ? { ...task, status: source.droppableId as Task["status"] }
           : task
       ))
