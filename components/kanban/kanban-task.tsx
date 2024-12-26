@@ -61,7 +61,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/tasks/${task.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${task.id}`, {
         method: "DELETE",
       })
 

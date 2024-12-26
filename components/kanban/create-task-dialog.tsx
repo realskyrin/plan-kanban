@@ -65,7 +65,7 @@ export function CreateTaskDialog({
     }
 
     try {
-      const response = await fetch("http://localhost:3001/tasks", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
