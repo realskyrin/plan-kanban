@@ -3,17 +3,17 @@
     {
       "id": "1",
       "name": "项目 1",
-      "description": "项目1，用于展示看板功能。天天天天",
+      "description": "项目1，用于展示看板功能",
       "status": "active",
       "createdAt": "2023-12-26T12:00:00.000Z",
-      "updatedAt": "2023-12-26T12:00:00.000Z"
+      "updatedAt": "2024-12-26T06:01:50.374Z"
     },
     {
-      "name": "罗延林",
+      "name": "阿萨斯大山大水",
       "description": "uuuuuuuu",
       "status": "active",
       "createdAt": "2024-12-26T05:39:15.883Z",
-      "updatedAt": "2024-12-26T05:39:15.883Z",
+      "updatedAt": "2024-12-26T06:02:03.725Z",
       "id": "12ScBN6"
     }
   ],
@@ -48,7 +48,7 @@
     {
       "title": "asdasasdasd",
       "description": "adadwdasdasdasd",
-      "status": "todo",
+      "status": "in_progress",
       "projectId": "12ScBN6",
       "createdAt": "2024-12-26T05:39:36.131Z",
       "updatedAt": "2024-12-26T05:39:36.131Z",
