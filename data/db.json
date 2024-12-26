@@ -7,14 +7,6 @@
       "status": "archived",
       "createdAt": "2023-12-26T12:00:00.000Z",
       "updatedAt": "2024-12-26T06:51:12.306Z"
-    },
-    {
-      "name": "lklkalskldklasdasd",
-      "description": "uuuuuuuuasasdasd",
-      "status": "completed",
-      "createdAt": "2024-12-26T05:39:15.883Z",
-      "updatedAt": "2024-12-26T07:29:44.422Z",
-      "id": "12ScBN6"
     }
   ],
   "tasks": [
@@ -47,26 +39,6 @@
       "updatedAt": "2024-12-26T06:37:47.504Z",
       "id": "faR2rc4",
       "priority": "high"
-    },
-    {
-      "title": "asdasasdasd",
-      "description": "adadwdasdasdasd",
-      "status": "done",
-      "projectId": "12ScBN6",
-      "createdAt": "2024-12-26T05:39:36.131Z",
-      "updatedAt": "2024-12-26T06:22:39.755Z",
-      "id": "hpp9jXw",
-      "priority": "medium"
-    },
-    {
-      "title": "安师大立刻就",
-      "description": "阿珂时间到啦上课就",
-      "priority": "high",
-      "status": "in_progress",
-      "projectId": "12ScBN6",
-      "createdAt": "2024-12-26T06:47:18.037Z",
-      "updatedAt": "2024-12-26T06:47:18.037Z",
-      "id": "3-ZdXmn"
     },
     {
       "title": "asasdasasd",

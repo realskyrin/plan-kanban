@@ -6,6 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
   Form,
   FormControl,
   FormDescription,
@@ -18,6 +26,9 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { createProject } from "@/lib/api"
+import { Plus } from "lucide-react"
+import { useState } from "react"
+import { useProject } from "@/components/providers/project-provider"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -26,9 +37,10 @@ const formSchema = z.object({
   description: z.string().optional(),
 })
 
-export default function NewProjectPage() {
-  const router = useRouter()
+export function CreateProjectDialog() {
+  const [open, setOpen] = useState(false)
   const { toast } = useToast()
+  const { refreshProjects } = useProject()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,7 +60,9 @@ export default function NewProjectPage() {
         title: "成功",
         description: "项目创建成功",
       })
-      router.push("/")
+      form.reset()
+      setOpen(false)
+      refreshProjects()
     } catch (error) {
       toast({
         title: "错误",
@@ -59,11 +73,22 @@ export default function NewProjectPage() {
   }
 
   return (
-    <main className="container mx-auto py-6">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">新建项目</h1>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          新建项目
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>新建项目</DialogTitle>
+          <DialogDescription>
+            创建一个新的项目来组织和管理你的任务
+          </DialogDescription>
+        </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -101,18 +126,14 @@ export default function NewProjectPage() {
               )}
             />
             <div className="flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-              >
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 取消
               </Button>
               <Button type="submit">创建项目</Button>
             </div>
           </form>
         </Form>
-      </div>
-    </main>
+      </DialogContent>
+    </Dialog>
   )
 } 
