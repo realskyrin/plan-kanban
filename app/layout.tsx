@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/providers/theme-provider'
@@ -7,9 +7,27 @@ import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#000000',
+}
+
 export const metadata: Metadata = {
   title: 'Plan Kanban',
-  description: '现代化的项目管理工具，专注于提供简单直观的看板式任务管理功能',
+  description: '一个简单高效的看板任务管理工具',
+  manifest: '/manifest.json',
+  icons: {
+    apple: [
+      { url: '/icons/icon-192x192.png' },
+    ],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Plan Kanban',
+  },
 }
 
 export default function RootLayout({
