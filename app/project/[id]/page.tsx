@@ -19,7 +19,7 @@ export default function ProjectPage({ params }: PageProps) {
   const [project, setProject] = useState<Project | null>(null)
 
   useEffect(() => {
-    const currentProject = projects.find(p => p.id === params.id)
+    const currentProject = projects.find(p => String(p.id) === params.id)
     setProject(currentProject || null)
   }, [params.id, projects])
 

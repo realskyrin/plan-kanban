@@ -1,144 +1,54 @@
 {
   "projects": [
     {
-      "id": "1",
-      "name": "项目 1",
-      "description": "项目1，用于展示看板功能",
-      "status": "archived",
-      "createdAt": "2023-12-26T12:00:00.000Z",
-      "updatedAt": "2024-12-26T06:51:12.306Z"
+      "name": "按时打算",
+      "description": "按时打算阿萨d",
+      "status": "active",
+      "createdAt": "2024-12-26T08:25:10.322Z",
+      "updatedAt": "2024-12-26T08:25:10.322Z",
+      "id": 1
     }
   ],
   "tasks": [
     {
-      "id": "1",
-      "title": "实现登录功能",
-      "description": "使用 Next.js Auth 实现用户登录功能",
-      "status": "done",
+      "title": "阿萨德阿萨德阿萨",
+      "description": "阿萨德阿萨德阿萨阿萨订单",
+      "priority": "medium",
+      "status": "todo",
       "projectId": "1",
-      "createdAt": "2023-12-26T12:00:00.000Z",
-      "updatedAt": "2024-12-26T06:20:04.641Z",
-      "priority": "low"
+      "createdAt": "2024-12-26T08:25:20.537Z",
+      "updatedAt": "2024-12-26T08:25:35.852Z",
+      "id": 1
     },
     {
-      "id": "2",
-      "title": "设计数据库架构",
-      "description": "设计项目所需的数据库表结构.....",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2023-12-26T12:00:00.000Z",
-      "updatedAt": "2024-12-26T07:29:31.907Z",
-      "priority": "medium"
-    },
-    {
-      "title": "asdasd ",
-      "description": "asdasdasdasd",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2024-12-26T05:22:26.689Z",
-      "updatedAt": "2024-12-26T06:37:47.504Z",
-      "id": "faR2rc4",
-      "priority": "high"
-    },
-    {
-      "title": "asasdasasd",
-      "description": "sasdasd",
+      "title": "090i0",
+      "description": "98908003485345",
       "priority": "low",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2024-12-26T07:30:41.891Z",
-      "updatedAt": "2024-12-26T07:30:41.891Z",
-      "id": "ls6a5sI"
-    },
-    {
-      "title": "asasd",
-      "description": "xzczxc",
-      "priority": "medium",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2024-12-26T07:30:46.705Z",
-      "updatedAt": "2024-12-26T07:30:46.705Z",
-      "id": "GlL0WQ_"
-    },
-    {
-      "title": "asdasd ",
-      "description": "asdasdac3e3r",
-      "priority": "medium",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2024-12-26T07:30:50.506Z",
-      "updatedAt": "2024-12-26T07:30:50.506Z",
-      "id": "XaBkB4j"
-    },
-    {
-      "title": "asdasd ",
-      "description": "asdasdasd asd ",
-      "priority": "medium",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2024-12-26T07:30:54.056Z",
-      "updatedAt": "2024-12-26T07:30:54.056Z",
-      "id": "FXqzAq8"
-    },
-    {
-      "title": "asdasda ",
-      "description": "czxcsadasdadasd",
-      "priority": "medium",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2024-12-26T07:30:58.238Z",
-      "updatedAt": "2024-12-26T07:30:58.238Z",
-      "id": "L9UCuDv"
-    },
-    {
-      "title": "asdasdas",
-      "description": "asdasdasd",
-      "priority": "low",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2024-12-26T07:31:45.406Z",
-      "updatedAt": "2024-12-26T07:31:45.406Z",
-      "id": "kl5gyP1"
-    },
-    {
-      "title": "asdasd",
-      "description": "asdasd",
-      "priority": "low",
-      "status": "done",
-      "projectId": "1",
-      "createdAt": "2024-12-26T07:32:29.904Z",
-      "updatedAt": "2024-12-26T07:32:29.904Z",
-      "id": "GyxMgea"
-    },
-    {
-      "title": "asdasdasas",
-      "description": "asdasdasd",
-      "priority": "medium",
       "status": "in_progress",
       "projectId": "1",
-      "createdAt": "2024-12-26T07:32:36.453Z",
-      "updatedAt": "2024-12-26T07:32:36.453Z",
-      "id": "8tnfUyB"
+      "createdAt": "2024-12-26T08:25:44.469Z",
+      "updatedAt": "2024-12-26T08:25:44.469Z",
+      "id": 2
     },
     {
-      "title": "asdasdasd",
-      "description": "zxczxczcsad",
+      "title": "按时打算",
+      "description": "阿萨德撒阿萨",
       "priority": "low",
-      "status": "done",
+      "status": "in_progress",
       "projectId": "1",
-      "createdAt": "2024-12-26T07:32:47.271Z",
-      "updatedAt": "2024-12-26T07:32:47.271Z",
-      "id": "0Yjy4bt"
+      "createdAt": "2024-12-26T08:25:48.651Z",
+      "updatedAt": "2024-12-26T08:25:48.651Z",
+      "id": 3
     },
     {
-      "title": "asdasdasd",
-      "description": "zczxcazsdasd",
-      "priority": "high",
-      "status": "done",
+      "title": "asda ",
+      "description": "asdasdasd",
+      "priority": "low",
+      "status": "todo",
       "projectId": "1",
-      "createdAt": "2024-12-26T07:32:54.103Z",
-      "updatedAt": "2024-12-26T07:32:54.103Z",
-      "id": "aAtlYrH"
+      "createdAt": "2024-12-26T08:29:42.112Z",
+      "updatedAt": "2024-12-26T08:29:42.112Z",
+      "id": 4
     }
   ]
 }
