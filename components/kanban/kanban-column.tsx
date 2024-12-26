@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 import { CreateTaskDialog } from "./create-task-dialog"
+import { cn } from "@/lib/utils"
 
 interface Task {
   id: string
@@ -44,11 +45,14 @@ export function KanbanColumn({ id, title, tasks, projectId, onTaskUpdate }: Kanb
         </Button>
       </div>
       <Droppable droppableId={id}>
-        {(provided) => (
+        {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex-1 p-4 space-y-4"
+            className={cn(
+              "flex-1 p-4 space-y-4 transition-colors",
+              snapshot.isDraggingOver && "border-2 border-dashed border-primary/50 rounded-lg bg-muted/50"
+            )}
           >
             {tasks.map((task, index) => (
               <KanbanTask

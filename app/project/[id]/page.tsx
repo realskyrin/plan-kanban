@@ -28,7 +28,7 @@ export default function ProjectPage({ params }: PageProps) {
       <div className="flex-1 space-y-4 p-4 md:p-8">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild>
               <Link href="/" className="flex items-center space-x-2">
                 <ChevronLeft className="h-4 w-4" />
                 <span>返回项目列表</span>
@@ -48,7 +48,7 @@ export default function ProjectPage({ params }: PageProps) {
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild>
               <Link href="/" className="flex items-center space-x-2">
                 <ChevronLeft className="h-4 w-4" />
                 <span>返回项目列表</span>

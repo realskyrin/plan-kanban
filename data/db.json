@@ -4,9 +4,9 @@
       "id": "1",
       "name": "项目 1",
       "description": "项目1，用于展示看板功能",
-      "status": "active",
+      "status": "archived",
       "createdAt": "2023-12-26T12:00:00.000Z",
-      "updatedAt": "2024-12-26T06:01:50.374Z"
+      "updatedAt": "2024-12-26T06:51:12.306Z"
     },
     {
       "name": "阿萨斯大山大水",
@@ -22,7 +22,7 @@
       "id": "1",
       "title": "实现登录功能",
       "description": "使用 Next.js Auth 实现用户登录功能",
-      "status": "done",
+      "status": "in_progress",
       "projectId": "1",
       "createdAt": "2023-12-26T12:00:00.000Z",
       "updatedAt": "2024-12-26T06:20:04.641Z",
@@ -32,7 +32,7 @@
       "id": "2",
       "title": "设计数据库架构",
       "description": "设计项目所需的数据库表结构",
-      "status": "done",
+      "status": "in_progress",
       "projectId": "1",
       "createdAt": "2023-12-26T12:00:00.000Z",
       "updatedAt": "2024-12-26T06:22:54.756Z",
@@ -41,7 +41,7 @@
     {
       "title": "asdasd ",
       "description": "asdasdasdasd",
-      "status": "done",
+      "status": "in_progress",
       "projectId": "1",
       "createdAt": "2024-12-26T05:22:26.689Z",
       "updatedAt": "2024-12-26T06:37:47.504Z",
@@ -72,7 +72,7 @@
       "title": "安师大立刻就",
       "description": "阿珂时间到啦上课就",
       "priority": "high",
-      "status": "todo",
+      "status": "in_progress",
       "projectId": "12ScBN6",
       "createdAt": "2024-12-26T06:47:18.037Z",
       "updatedAt": "2024-12-26T06:47:18.037Z",
