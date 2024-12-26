@@ -51,10 +51,19 @@ export function CreateTaskDialog({
   }>({
     title: "",
     description: "",
-    priority: "medium",
+    priority: "low",
   })
 
   const handleSubmit = async () => {
+    if (!form.title.trim()) {
+      toast({
+        title: "错误",
+        description: "任务标题不能为空",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       const response = await fetch("http://localhost:3001/tasks", {
         method: "POST",

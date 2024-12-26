@@ -21,10 +21,11 @@ interface KanbanColumnProps {
   id: string
   title: string
   tasks: Task[]
+  projectId: string
   onTaskUpdate: () => void
 }
 
-export function KanbanColumn({ id, title, tasks, onTaskUpdate }: KanbanColumnProps) {
+export function KanbanColumn({ id, title, tasks, projectId, onTaskUpdate }: KanbanColumnProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
   return (
@@ -66,6 +67,7 @@ export function KanbanColumn({ id, title, tasks, onTaskUpdate }: KanbanColumnPro
         onOpenChange={setIsCreateDialogOpen}
         status={id as Task["status"]}
         onTaskCreated={onTaskUpdate}
+        projectId={projectId}
       />
     </div>
   )

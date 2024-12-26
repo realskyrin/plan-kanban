@@ -127,6 +127,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             title={column.title}
             tasks={column.tasks}
             onTaskUpdate={fetchTasks}
+            projectId={projectId}
           />
         ))}
       </div>
