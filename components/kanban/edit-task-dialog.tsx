@@ -14,12 +14,20 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface Task {
   id: string
   title: string
   description: string
   status: "todo" | "in_progress" | "done"
+  priority: "low" | "medium" | "high"
   projectId: string
   createdAt: string
   updatedAt: string
@@ -32,6 +40,12 @@ interface EditTaskDialogProps {
   onTaskUpdated: () => void
 }
 
+const priorityOptions = [
+  { value: "low", label: "低优先级" },
+  { value: "medium", label: "中优先级" },
+  { value: "high", label: "高优先级" },
+] as const
+
 export function EditTaskDialog({
   open,
   onOpenChange,
@@ -39,9 +53,14 @@ export function EditTaskDialog({
   onTaskUpdated,
 }: EditTaskDialogProps) {
   const { toast } = useToast()
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    title: string
+    description: string
+    priority: "low" | "medium" | "high"
+  }>({
     title: task.title,
     description: task.description,
+    priority: task.priority,
   })
 
   const handleSubmit = async () => {
@@ -106,6 +125,26 @@ export function EditTaskDialog({
                 }))
               }
             />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="priority">优先级</Label>
+            <Select
+              value={form.priority}
+              onValueChange={(value: "low" | "medium" | "high") =>
+                setForm((prev) => ({ ...prev, priority: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="选择优先级" />
+              </SelectTrigger>
+              <SelectContent>
+                {priorityOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter>

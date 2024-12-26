@@ -20,16 +20,34 @@ import { zhCN } from "date-fns/locale"
 import { useState } from "react"
 import { EditTaskDialog } from "./edit-task-dialog"
 import { useToast } from "@/components/ui/use-toast"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 
 interface Task {
   id: string
   title: string
   description: string
   status: "todo" | "in_progress" | "done"
+  priority?: "low" | "medium" | "high"
   projectId: string
   createdAt: string
   updatedAt: string
 }
+
+const priorityConfig = {
+  low: {
+    label: "低优先级",
+    color: "bg-green-800",
+  },
+  medium: {
+    label: "中优先级",
+    color: "bg-yellow-500",
+  },
+  high: {
+    label: "高优先级",
+    color: "bg-red-800",
+  },
+} as const
 
 interface KanbanTaskProps {
   task: Task
@@ -62,6 +80,8 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
       })
     }
   }
+
+  const priority = task.priority || "low"
 
   return (
     <Draggable draggableId={task.id} index={index}>
@@ -99,20 +119,34 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                 {task.description || "暂无描述"}
               </p>
             </CardContent>
-            <CardFooter>
-              <span className="text-sm text-muted-foreground">
-                更新于{" "}
-                {formatDistanceToNow(new Date(task.updatedAt), {
-                  addSuffix: true,
-                  locale: zhCN,
-                })}
-              </span>
+            <CardFooter className="flex flex-col space-y-2">
+              <div className="flex items-center justify-between w-full">
+                <Badge 
+                  variant="secondary" 
+                  className={cn(
+                    "text-white",
+                    priorityConfig[priority].color
+                  )}
+                >
+                  {priorityConfig[priority].label}
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  更新于{" "}
+                  {formatDistanceToNow(new Date(task.updatedAt), {
+                    addSuffix: true,
+                    locale: zhCN,
+                  })}
+                </span>
+              </div>
             </CardFooter>
           </Card>
           <EditTaskDialog
             open={isEditDialogOpen}
             onOpenChange={setIsEditDialogOpen}
-            task={task}
+            task={{
+              ...task,
+              priority: priority,
+            }}
             onTaskUpdated={onUpdate}
           />
         </div>

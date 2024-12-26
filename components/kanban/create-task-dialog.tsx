@@ -14,36 +14,44 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
-import { useParams } from "next/navigation"
-
-interface Task {
-  id: string
-  title: string
-  description: string
-  status: "todo" | "in_progress" | "done"
-  projectId: string
-  createdAt: string
-  updatedAt: string
-}
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface CreateTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  status: Task["status"]
+  projectId: string
+  status: "todo" | "in_progress" | "done"
   onTaskCreated: () => void
 }
+
+const priorityOptions = [
+  { value: "low", label: "低优先级" },
+  { value: "medium", label: "中优先级" },
+  { value: "high", label: "高优先级" },
+] as const
 
 export function CreateTaskDialog({
   open,
   onOpenChange,
+  projectId,
   status,
   onTaskCreated,
 }: CreateTaskDialogProps) {
-  const params = useParams()
   const { toast } = useToast()
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    title: string
+    description: string
+    priority: "low" | "medium" | "high"
+  }>({
     title: "",
     description: "",
+    priority: "medium",
   })
 
   const handleSubmit = async () => {
@@ -56,7 +64,7 @@ export function CreateTaskDialog({
         body: JSON.stringify({
           ...form,
           status,
-          projectId: params.id,
+          projectId,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }),
@@ -66,7 +74,11 @@ export function CreateTaskDialog({
 
       onTaskCreated()
       onOpenChange(false)
-      setForm({ title: "", description: "" })
+      setForm({
+        title: "",
+        description: "",
+        priority: "medium",
+      })
       toast({
         title: "成功",
         description: "任务已创建",
@@ -86,7 +98,7 @@ export function CreateTaskDialog({
         <DialogHeader>
           <DialogTitle>创建任务</DialogTitle>
           <DialogDescription>
-            在当前列表中创建一个新任务。
+            填写任务信息，完成后点击创建。
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -112,6 +124,26 @@ export function CreateTaskDialog({
                 }))
               }
             />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="priority">优先级</Label>
+            <Select
+              value={form.priority}
+              onValueChange={(value: "low" | "medium" | "high") =>
+                setForm((prev) => ({ ...prev, priority: value }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="选择优先级" />
+              </SelectTrigger>
+              <SelectContent>
+                {priorityOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <DialogFooter>
