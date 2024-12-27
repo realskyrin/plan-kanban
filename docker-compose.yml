@@ -1,24 +1,24 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # 修改为 localhost:8088，因为浏览器是从本地访问的
+        - NEXT_PUBLIC_API_BASE_URL=http://localhost:8088
     ports:
       - "8099:3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_BASE_URL=http://json-server:3001
     depends_on:
       - json-server
 
   json-server:
-    image: node:18-alpine
+    image: node:22-alpine
     working_dir: /app
     volumes:
       - ./data:/app/data
     ports:
-      - "3001:3001"
+      - "8088:3001"
     command: >
-      sh -c "npm install -g json-server && json-server --watch /app/data/db.json --port 3001 --host 0.0.0.0" 
+      sh -c "npm install -g json-server && json-server --watch /app/data/db.json --port 3001 --host 0.0.0.0"
