@@ -36,6 +36,15 @@ export async function updateProject(
 }
 
 export async function deleteProject(id: string) {
+  // 首先获取与项目相关的所有任务
+  const tasks = await api.get<Task[]>(`/tasks?projectId=${id}`)
+  
+  // 删除所有相关任务
+  await Promise.all(
+    tasks.data.map((task) => api.delete(`/tasks/${task.id}`))
+  )
+  
+  // 最后删除项目本身
   await api.delete(`/projects/${id}`)
 }
 
