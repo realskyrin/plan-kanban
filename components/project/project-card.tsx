@@ -28,7 +28,7 @@ import { useState } from "react"
 
 interface Project {
   id: string
-  name: string
+  title: string
   description: string
   status: "active" | "completed" | "archived"
   createdAt: string
@@ -44,7 +44,7 @@ interface ProjectCardProps {
 export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editForm, setEditForm] = useState({
-    name: project.name,
+    title: project.title,
     description: project.description,
     status: project.status,
   })
@@ -53,9 +53,9 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
     active: { label: "进行中", className: "text-green-600" },
     completed: { label: "已完成", className: "text-blue-600" },
     archived: { label: "已归档", className: "text-gray-600" },
-  }
+  } as const
 
-  const { label, className } = statusMap[project.status]
+  const { label, className } = statusMap[project.status as keyof typeof statusMap] || statusMap.active
 
   const handleEditSubmit = async () => {
     await onUpdate(project.id, editForm)
@@ -69,7 +69,7 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
           href={`/project/${project.id}`}
           className="font-semibold hover:underline"
         >
-          {project.name}
+          {project.title}
         </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -117,12 +117,12 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">项目名称</Label>
+              <Label htmlFor="title">项目名称</Label>
               <Input
-                id="name"
-                value={editForm.name}
+                id="title"
+                value={editForm.title}
                 onChange={(e) =>
-                  setEditForm((prev) => ({ ...prev, name: e.target.value }))
+                  setEditForm((prev) => ({ ...prev, title: e.target.value }))
                 }
               />
             </div>

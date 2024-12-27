@@ -5,7 +5,7 @@ import { CreateProjectDialog } from "./create-project-dialog"
 
 interface Project {
   id: string
-  name: string
+  title: string
   description: string
   status: "active" | "completed" | "archived"
   createdAt: string

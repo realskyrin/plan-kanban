@@ -31,7 +31,7 @@ import { useState } from "react"
 import { useProject } from "@/components/providers/project-provider"
 
 const formSchema = z.object({
-  name: z.string().min(2, {
+  title: z.string().min(2, {
     message: "项目名称至少需要2个字符",
   }),
   description: z.string().optional(),
@@ -44,7 +44,7 @@ export function CreateProjectDialog() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
+      title: "",
       description: "",
     },
   })
@@ -52,7 +52,7 @@ export function CreateProjectDialog() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       await createProject({
-        name: values.name,
+        title: values.title,
         description: values.description || "",
         status: "active",
       })
@@ -91,7 +91,7 @@ export function CreateProjectDialog() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="name"
+              name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>项目名称</FormLabel>

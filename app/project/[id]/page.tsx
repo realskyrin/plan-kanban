@@ -55,7 +55,7 @@ export default function ProjectPage({ params }: PageProps) {
               </Link>
             </Button>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">{project.name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{project.title}</h1>
           <p className="text-muted-foreground">{project.description}</p>
         </div>
       </div>

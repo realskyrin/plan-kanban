@@ -42,7 +42,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   async function fetchTasks() {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks?projectId=${projectId}`
+        `/api/tasks?projectId=${projectId}`
       )
       const data = await response.json()
       setTasks(data)
@@ -86,7 +86,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${taskToUpdate.id}`,
+        `/api/tasks/${taskToUpdate.id}`,
         {
           method: "PATCH",
           headers: {
