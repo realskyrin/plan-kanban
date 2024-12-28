@@ -26,6 +26,7 @@ model Task {
   description String?
   status      String    @default("TODO")
   priority    String    @default("MEDIUM")
+  order       Int       @default(0)
   project     Project   @relation(fields: [projectId], references: [id])
   projectId   String
   createdAt   DateTime  @default(now())

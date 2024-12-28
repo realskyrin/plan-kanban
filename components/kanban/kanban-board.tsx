@@ -10,6 +10,7 @@ interface Task {
   title: string
   description: string
   status: "todo" | "in_progress" | "done"
+  order: number
   projectId: string
   createdAt: string
   updatedAt: string
@@ -27,15 +28,21 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const columns = {
     todo: {
       title: "待办",
-      tasks: tasks.filter((task) => task.status === "todo"),
+      tasks: tasks
+        .filter((task) => task.status === "todo")
+        .sort((a, b) => a.order - b.order),
     },
     in_progress: {
       title: "进行中",
-      tasks: tasks.filter((task) => task.status === "in_progress"),
+      tasks: tasks
+        .filter((task) => task.status === "in_progress")
+        .sort((a, b) => a.order - b.order),
     },
     done: {
       title: "已完成",
-      tasks: tasks.filter((task) => task.status === "done"),
+      tasks: tasks
+        .filter((task) => task.status === "done")
+        .sort((a, b) => a.order - b.order),
     },
   }
 
@@ -76,9 +83,33 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     const taskToUpdate = tasks.find((task) => String(task.id) === draggableId)
     if (!taskToUpdate) return
 
+    // 获取目标列的任务
+    const targetColumnTasks = tasks
+      .filter((task) => task.status === destination.droppableId)
+      .sort((a, b) => a.order - b.order)
+
+    // 计算新的 order
+    let newOrder: number
+    if (targetColumnTasks.length === 0) {
+      newOrder = 1000 // 初始顺序
+    } else if (destination.index === 0) {
+      newOrder = targetColumnTasks[0].order - 1000 // 放在最前面
+    } else if (destination.index >= targetColumnTasks.length) {
+      newOrder = targetColumnTasks[targetColumnTasks.length - 1].order + 1000 // 放在最后面
+    } else {
+      // 放在中间
+      const prevOrder = targetColumnTasks[destination.index - 1].order
+      const nextOrder = targetColumnTasks[destination.index].order
+      newOrder = (prevOrder + nextOrder) / 2
+    }
+
     const updatedTasks = tasks.map((task) =>
       String(task.id) === draggableId
-        ? { ...task, status: destination.droppableId as Task["status"] }
+        ? { 
+            ...task, 
+            status: destination.droppableId as Task["status"],
+            order: newOrder
+          }
         : task
     )
     
@@ -94,6 +125,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           },
           body: JSON.stringify({
             status: destination.droppableId as Task["status"],
+            order: newOrder,
+            updatedAt: taskToUpdate.updatedAt // 保持原来的更新时间
           }),
         }
       )
@@ -104,7 +137,11 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     } catch (error) {
       setTasks((prev) => prev.map((task) =>
         String(task.id) === draggableId
-          ? { ...task, status: source.droppableId as Task["status"] }
+          ? { 
+              ...task, 
+              status: source.droppableId as Task["status"],
+              order: taskToUpdate.order 
+            }
           : task
       ))
       
