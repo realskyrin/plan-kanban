@@ -11,7 +11,7 @@
   - Radix UI Primitives
 - **样式**: Tailwind CSS
 - **状态管理**: URL Search Params (nuqs)
-- **数据存储**: JSON Server
+- **数据存储**: PostgreSQL
 
 ## 特性
 
@@ -28,6 +28,7 @@
 
 - Node.js 18.0.0 或更高版本
 - npm 或 yarn 或 pnpm
+- PostgreSQL 15.0 或更高版本
 
 ### 安装步骤
 
@@ -50,7 +51,9 @@ pnpm install
 
 3. 环境配置
 
-复制 `.env.example` 文件为 `.env`，并根据需要修改配置。
+复制 `.env.example` 文件为 `.env`，并配置以下必要环境变量：
+- DATABASE_URL: PostgreSQL 数据库连接字符串
+- 其他必要的环境变量
 
 4. 启动开发服务器
 
