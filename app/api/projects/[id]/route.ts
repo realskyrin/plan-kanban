@@ -44,6 +44,7 @@ export async function PATCH(
       data: {
         title: json.title,
         description: json.description,
+        status: json.status,
         updatedAt: new Date(),
       },
     });
