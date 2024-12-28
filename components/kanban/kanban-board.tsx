@@ -5,6 +5,8 @@ import { KanbanColumn } from "./kanban-column"
 import { useToast } from "@/components/ui/use-toast"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import { useConfetti } from "@/hooks/use-confetti"
+import { cn } from "@/lib/utils"
+import { Trash2 } from "lucide-react"
 
 interface Task {
   id: string
@@ -25,6 +27,8 @@ interface KanbanBoardProps {
 export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isDragging, setIsDragging] = useState(false)
+  const [isOverDelete, setIsOverDelete] = useState(false)
   const { fireConfetti } = useConfetti()
   const { toast } = useToast()
 
@@ -69,10 +73,46 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     fetchTasks()
   }, [projectId])
 
+  const handleDelete = async (taskId: string) => {
+    try {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) throw new Error("删除失败")
+
+      setTasks((prev) => prev.filter((task) => task.id !== taskId))
+      toast({
+        title: "成功",
+        description: "任务已删除",
+      })
+    } catch (error) {
+      toast({
+        title: "错误",
+        description: "删除任务失败",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const onDragStart = () => {
+    setIsDragging(true)
+  }
+
   const onDragEnd = async (result: DropResult) => {
+    setIsDragging(false)
+    setIsOverDelete(false)
+
     const { destination, source, draggableId } = result
 
-    if (!destination) return
+    if (!destination) {
+      // 检查是否在删除区域上方结束拖拽
+      if (isOverDelete) {
+        await handleDelete(draggableId)
+        return
+      }
+      return
+    }
 
     if (
       destination.droppableId === source.droppableId &&
@@ -176,7 +216,28 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+      {isDragging && (
+        <div
+          className={cn(
+            "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-64 h-24 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200",
+            isOverDelete
+              ? "border-red-500 bg-red-100 shadow-[0_0_20px_rgba(239,68,68,0.5)]"
+              : "border-red-300 bg-white",
+            !isDragging && "opacity-0 pointer-events-none"
+          )}
+          onMouseEnter={() => setIsOverDelete(true)}
+          onMouseLeave={() => setIsOverDelete(false)}
+        >
+          <div className="flex flex-col items-center space-y-2 text-red-500">
+            <Trash2 className={cn(
+              "w-6 h-6 transition-transform duration-200",
+              isOverDelete && "scale-125"
+            )} />
+            <span className="text-sm font-medium">拖到此处删除</span>
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {Object.entries(columns).map(([columnId, column]) => (
           <KanbanColumn
