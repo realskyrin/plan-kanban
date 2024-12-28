@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { KanbanColumn } from "./kanban-column"
 import { useToast } from "@/components/ui/use-toast"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
+import { useConfetti } from "@/hooks/use-confetti"
 
 interface Task {
   id: string
@@ -24,6 +25,7 @@ interface KanbanBoardProps {
 export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const { fireConfetti } = useConfetti()
   const { toast } = useToast()
 
   const columns = {
@@ -77,6 +79,11 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       destination.index === source.index
     ) {
       return
+    }
+
+    // 检查是否拖拽到 DONE 列
+    if (destination.droppableId === "DONE" && source.droppableId !== "DONE") {
+      fireConfetti()
     }
 
     const taskToUpdate = tasks.find((task) => task.id === draggableId)
