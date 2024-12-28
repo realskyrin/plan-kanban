@@ -4,12 +4,10 @@ import { prisma } from "@/lib/prisma";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const boardId = searchParams.get("boardId");
     const projectId = searchParams.get("projectId");
 
     const tasks = await prisma.task.findMany({
       where: {
-        ...(boardId ? { boardId } : {}),
         ...(projectId ? { projectId } : {}),
       },
       include: {
@@ -36,7 +34,6 @@ export async function POST(request: Request) {
         status: json.status,
         priority: json.priority,
         projectId: json.projectId,
-        boardId: json.boardId,
       },
     });
     return NextResponse.json(task);

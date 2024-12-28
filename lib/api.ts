@@ -32,10 +32,9 @@ export async function deleteProject(id: string) {
   await api.delete(`/projects/${id}`)
 }
 
-export async function getTasks(projectId?: string, boardId?: string) {
+export async function getTasks(projectId?: string) {
   const params = new URLSearchParams()
   if (projectId) params.append("projectId", projectId)
-  if (boardId) params.append("boardId", boardId)
   
   const response = await api.get<Task[]>(`/tasks?${params.toString()}`)
   return response.data
