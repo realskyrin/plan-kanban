@@ -2,7 +2,7 @@ export interface Project {
   id: string
   title: string
   description: string
-  status: string
+  status: "active" | "completed" | "archived"
   createdAt: string
   updatedAt: string
 }
