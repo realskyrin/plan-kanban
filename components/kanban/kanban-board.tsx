@@ -88,18 +88,23 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       .filter((task) => task.status === destination.droppableId)
       .sort((a, b) => a.order - b.order)
 
+    // 如果是同一列内的拖动，需要移除当前任务
+    const targetColumnTasksWithoutCurrent = destination.droppableId === source.droppableId
+      ? targetColumnTasks.filter((task) => String(task.id) !== draggableId)
+      : targetColumnTasks
+
     // 计算新的 order
     let newOrder: number
-    if (targetColumnTasks.length === 0) {
+    if (targetColumnTasksWithoutCurrent.length === 0) {
       newOrder = 1000 // 初始顺序
     } else if (destination.index === 0) {
-      newOrder = targetColumnTasks[0].order - 1000 // 放在最前面
-    } else if (destination.index >= targetColumnTasks.length) {
-      newOrder = targetColumnTasks[targetColumnTasks.length - 1].order + 1000 // 放在最后面
+      newOrder = targetColumnTasksWithoutCurrent[0].order - 1000 // 放在最前面
+    } else if (destination.index >= targetColumnTasksWithoutCurrent.length) {
+      newOrder = targetColumnTasksWithoutCurrent[targetColumnTasksWithoutCurrent.length - 1].order + 1000 // 放在最后面
     } else {
       // 放在中间
-      const prevOrder = targetColumnTasks[destination.index - 1].order
-      const nextOrder = targetColumnTasks[destination.index].order
+      const prevOrder = targetColumnTasksWithoutCurrent[destination.index - 1].order
+      const nextOrder = targetColumnTasksWithoutCurrent[destination.index].order
       newOrder = (prevOrder + nextOrder) / 2
     }
 
