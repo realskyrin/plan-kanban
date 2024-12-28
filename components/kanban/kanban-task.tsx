@@ -22,6 +22,13 @@ import { EditTaskDialog } from "./edit-task-dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface Task {
   id: string
@@ -58,6 +65,7 @@ interface KanbanTaskProps {
 
 export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const { toast } = useToast()
 
   const handleDelete = async () => {
@@ -94,26 +102,35 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
             snapshot.isDragging && "rotate-2"
           )}
         >
-          <Card className={cn(
-            "border shadow-sm transition-all",
-            snapshot.isDragging && "shadow-lg"
-          )}>
+          <Card 
+            className={cn(
+              "border shadow-sm transition-all cursor-pointer hover:shadow-md",
+              snapshot.isDragging && "shadow-lg"
+            )}
+            onClick={() => setIsViewDialogOpen(true)}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <h4 className="font-semibold">{task.title}</h4>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                   <Button variant="ghost" className="h-8 w-8 p-0">
                     <span className="sr-only">打开菜单</span>
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+                  <DropdownMenuItem onClick={(e) => {
+                    e.stopPropagation()
+                    setIsEditDialogOpen(true)
+                  }}>
                     编辑任务
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-red-600"
-                    onClick={handleDelete}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete()
+                    }}
                   >
                     删除任务
                   </DropdownMenuItem>
@@ -152,6 +169,46 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
             task={task}
             onTaskUpdated={onUpdate}
           />
+          <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{task.title}</DialogTitle>
+                <DialogDescription>
+                  创建于{" "}
+                  {formatDistanceToNow(new Date(task.createdAt), {
+                    addSuffix: true,
+                    locale: zhCN,
+                  })}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium mb-2">任务描述</h4>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {task.description || "暂无描述"}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <Badge 
+                    variant="secondary" 
+                    className={cn(
+                      "text-white",
+                      priorityConfig[task.priority].color
+                    )}
+                  >
+                    {priorityConfig[task.priority].label}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    更新于{" "}
+                    {formatDistanceToNow(new Date(task.updatedAt), {
+                      addSuffix: true,
+                      locale: zhCN,
+                    })}
+                  </span>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       )}
     </Draggable>
