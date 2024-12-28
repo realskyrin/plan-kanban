@@ -12,21 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { formatDistanceToNow } from "date-fns"
 import { zhCN } from "date-fns/locale"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
-import { useToast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
+import { EditProjectDialog } from "./edit-project-dialog"
 
 interface Project {
   id: string
@@ -44,13 +31,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
-  const { toast } = useToast()
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [editForm, setEditForm] = useState({
-    title: project.title,
-    description: project.description,
-    status: project.status,
-  })
 
   const statusMap = {
     ACTIVE: { label: "进行中", className: "text-green-600" },
@@ -59,30 +40,6 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
   } as const
 
   const { label, className } = statusMap[project.status] || statusMap.ACTIVE
-
-  const handleEditSubmit = async () => {
-    try {
-      await onUpdate(project.id, editForm)
-      setIsEditDialogOpen(false)
-    } catch (error) {
-      const errorMessage = process.env.DEBUG_PROD === 'true' 
-        ? `更新项目失败: ${error instanceof Error ? error.message : '未知错误'}`
-        : '更新项目失败，请稍后重试'
-
-      toast({
-        variant: "destructive",
-        title: "错误",
-        description: errorMessage,
-        action: process.env.DEBUG_PROD === 'true' ? (
-          <ToastAction altText="复制错误信息" onClick={() => {
-            navigator.clipboard.writeText(String(error))
-          }}>
-            复制错误信息
-          </ToastAction>
-        ) : undefined
-      })
-    }
-  }
 
   return (
     <Card>
@@ -129,66 +86,12 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
         </span>
       </CardFooter>
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>编辑项目</DialogTitle>
-            <DialogDescription>
-              修改项目信息，完成后点击保存。
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="title">项目名称</Label>
-              <Input
-                id="title"
-                value={editForm.title}
-                onChange={(e) =>
-                  setEditForm((prev) => ({ ...prev, title: e.target.value }))
-                }
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="description">项目描述</Label>
-              <Textarea
-                id="description"
-                value={editForm.description}
-                onChange={(e) =>
-                  setEditForm((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="status">项目状态</Label>
-              <select
-                id="status"
-                aria-label="项目状态"
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                value={editForm.status}
-                onChange={(e) =>
-                  setEditForm((prev) => ({
-                    ...prev,
-                    status: e.target.value as Project["status"],
-                  }))
-                }
-              >
-                <option value="ACTIVE">进行中</option>
-                <option value="COMPLETED">已完成</option>
-                <option value="ARCHIVED">已归档</option>
-              </select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              取消
-            </Button>
-            <Button onClick={handleEditSubmit}>保存</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <EditProjectDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        project={project}
+        onProjectUpdated={onUpdate}
+      />
     </Card>
   )
 } 
