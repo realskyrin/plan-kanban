@@ -65,7 +65,7 @@ export function EditTaskDialog({
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/tasks/${task.id}`, {
+      const response = await fetch(`/api/tasks/${task.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
