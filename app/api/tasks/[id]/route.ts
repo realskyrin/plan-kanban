@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(
   request: Request,
@@ -24,6 +25,7 @@ export async function GET(
 
     return NextResponse.json(task);
   } catch (error) {
+    console.error("Failed to fetch task:", error);
     return NextResponse.json(
       { error: "Failed to fetch task" },
       { status: 500 }
@@ -39,28 +41,30 @@ export async function PATCH(
     const body = await request.json()
     const { status, title, description, priority, order, updatedAt } = body
 
-    // 检查是否只更新了 order 字段
-    const updateData: any = {}
-    if (status !== undefined) updateData.status = status
-    if (title !== undefined) updateData.title = title
-    if (description !== undefined) updateData.description = description
-    if (priority !== undefined) updateData.priority = priority
-    if (order !== undefined) updateData.order = order
-
-    // 如果只更新了 order，保持原来的 updatedAt
-    if (Object.keys(updateData).length === 1 && updateData.order !== undefined && updatedAt) {
-      updateData.updatedAt = new Date(updatedAt)
+    const updateData = {
+      ...(status !== undefined && { status }),
+      ...(title !== undefined && { title }),
+      ...(description !== undefined && { description }),
+      ...(priority !== undefined && { priority }),
+      ...(order !== undefined && { order }),
+      ...(Object.keys(body).length === 1 && order !== undefined && updatedAt && {
+        updatedAt: new Date(updatedAt)
+      }),
     }
 
     const task = await prisma.task.update({
       where: {
         id: params.id,
       },
-      data: updateData,
+      data: updateData as Prisma.TaskUpdateInput,
+      include: {
+        project: true,
+      },
     })
 
     return NextResponse.json(task)
   } catch (error) {
+    console.error("Failed to update task:", error);
     return NextResponse.json(
       { error: "更新任务失败" },
       { status: 500 }
@@ -80,6 +84,7 @@ export async function DELETE(
     });
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("Failed to delete task:", error);
     return NextResponse.json(
       { error: "Failed to delete task" },
       { status: 500 }

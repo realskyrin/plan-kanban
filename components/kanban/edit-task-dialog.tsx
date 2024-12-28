@@ -23,11 +23,12 @@ import {
 } from "@/components/ui/select"
 
 interface Task {
-  id: number
+  id: string
   title: string
-  description: string
-  status: "todo" | "in_progress" | "done"
-  priority: "low" | "medium" | "high"
+  description: string | null
+  status: "TODO" | "IN_PROGRESS" | "DONE"
+  priority: "LOW" | "MEDIUM" | "HIGH"
+  order: number
   projectId: string
   createdAt: string
   updatedAt: string
@@ -41,9 +42,9 @@ interface EditTaskDialogProps {
 }
 
 const priorityOptions = [
-  { value: "low", label: "低优先级" },
-  { value: "medium", label: "中优先级" },
-  { value: "high", label: "高优先级" },
+  { value: "LOW", label: "低优先级" },
+  { value: "MEDIUM", label: "中优先级" },
+  { value: "HIGH", label: "高优先级" },
 ] as const
 
 export function EditTaskDialog({
@@ -55,8 +56,8 @@ export function EditTaskDialog({
   const { toast } = useToast()
   const [form, setForm] = useState<{
     title: string
-    description: string
-    priority: "low" | "medium" | "high"
+    description: string | null
+    priority: "LOW" | "MEDIUM" | "HIGH"
   }>({
     title: task.title,
     description: task.description,
@@ -117,11 +118,11 @@ export function EditTaskDialog({
             <Label htmlFor="description">任务描述</Label>
             <Textarea
               id="description"
-              value={form.description}
+              value={form.description || ""}
               onChange={(e) =>
                 setForm((prev) => ({
                   ...prev,
-                  description: e.target.value,
+                  description: e.target.value || null,
                 }))
               }
             />
@@ -130,7 +131,7 @@ export function EditTaskDialog({
             <Label htmlFor="priority">优先级</Label>
             <Select
               value={form.priority}
-              onValueChange={(value: "low" | "medium" | "high") =>
+              onValueChange={(value: "LOW" | "MEDIUM" | "HIGH") =>
                 setForm((prev) => ({ ...prev, priority: value }))
               }
             >

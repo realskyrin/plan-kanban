@@ -24,26 +24,27 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 interface Task {
-  id: number
+  id: string
   title: string
-  description: string
-  status: "todo" | "in_progress" | "done"
-  priority?: "low" | "medium" | "high"
+  description: string | null
+  status: "TODO" | "IN_PROGRESS" | "DONE"
+  priority: "LOW" | "MEDIUM" | "HIGH"
+  order: number
   projectId: string
   createdAt: string
   updatedAt: string
 }
 
 const priorityConfig = {
-  low: {
+  LOW: {
     label: "低优先级",
     color: "bg-green-800",
   },
-  medium: {
+  MEDIUM: {
     label: "中优先级",
     color: "bg-yellow-500",
   },
-  high: {
+  HIGH: {
     label: "高优先级",
     color: "bg-red-800",
   },
@@ -81,10 +82,8 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
     }
   }
 
-  const priority = task.priority || "low"
-
   return (
-    <Draggable draggableId={String(task.id)} index={index}>
+    <Draggable draggableId={task.id} index={index}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
@@ -132,10 +131,10 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                   variant="secondary" 
                   className={cn(
                     "text-white",
-                    priorityConfig[priority].color
+                    priorityConfig[task.priority].color
                   )}
                 >
-                  {priorityConfig[priority].label}
+                  {priorityConfig[task.priority].label}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
                   更新于{" "}
@@ -150,10 +149,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
           <EditTaskDialog
             open={isEditDialogOpen}
             onOpenChange={setIsEditDialogOpen}
-            task={{
-              ...task,
-              priority: priority,
-            }}
+            task={task}
             onTaskUpdated={onUpdate}
           />
         </div>

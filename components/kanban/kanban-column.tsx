@@ -9,10 +9,12 @@ import { CreateTaskDialog } from "./create-task-dialog"
 import { cn } from "@/lib/utils"
 
 interface Task {
-  id: number
+  id: string
   title: string
-  description: string
-  status: "todo" | "in_progress" | "done"
+  description: string | null
+  status: "TODO" | "IN_PROGRESS" | "DONE"
+  priority: "LOW" | "MEDIUM" | "HIGH"
+  order: number
   projectId: string
   createdAt: string
   updatedAt: string

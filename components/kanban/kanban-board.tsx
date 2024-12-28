@@ -6,10 +6,11 @@ import { useToast } from "@/components/ui/use-toast"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 
 interface Task {
-  id: number
+  id: string
   title: string
-  description: string
-  status: "todo" | "in_progress" | "done"
+  description: string | null
+  status: "TODO" | "IN_PROGRESS" | "DONE"
+  priority: "LOW" | "MEDIUM" | "HIGH"
   order: number
   projectId: string
   createdAt: string
@@ -26,31 +27,29 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const { toast } = useToast()
 
   const columns = {
-    todo: {
+    TODO: {
       title: "待办",
       tasks: tasks
-        .filter((task) => task.status === "todo")
+        .filter((task) => task.status === "TODO")
         .sort((a, b) => a.order - b.order),
     },
-    in_progress: {
+    IN_PROGRESS: {
       title: "进行中",
       tasks: tasks
-        .filter((task) => task.status === "in_progress")
+        .filter((task) => task.status === "IN_PROGRESS")
         .sort((a, b) => a.order - b.order),
     },
-    done: {
+    DONE: {
       title: "已完成",
       tasks: tasks
-        .filter((task) => task.status === "done")
+        .filter((task) => task.status === "DONE")
         .sort((a, b) => a.order - b.order),
     },
   }
 
   async function fetchTasks() {
     try {
-      const response = await fetch(
-        `/api/tasks?projectId=${projectId}`
-      )
+      const response = await fetch(`/api/tasks?projectId=${projectId}`)
       const data = await response.json()
       setTasks(data)
     } catch (error) {
@@ -80,7 +79,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       return
     }
 
-    const taskToUpdate = tasks.find((task) => String(task.id) === draggableId)
+    const taskToUpdate = tasks.find((task) => task.id === draggableId)
     if (!taskToUpdate) return
 
     // 获取目标列的任务
@@ -90,7 +89,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
     // 如果是同一列内的拖动，需要移除当前任务
     const targetColumnTasksWithoutCurrent = destination.droppableId === source.droppableId
-      ? targetColumnTasks.filter((task) => String(task.id) !== draggableId)
+      ? targetColumnTasks.filter((task) => task.id !== draggableId)
       : targetColumnTasks
 
     // 计算新的 order
@@ -108,17 +107,13 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       newOrder = (prevOrder + nextOrder) / 2
     }
 
-    const updatedTasks = tasks.map((task) =>
-      String(task.id) === draggableId
-        ? { 
-            ...task, 
-            status: destination.droppableId as Task["status"],
-            order: newOrder
-          }
+    // 乐观更新
+    const newStatus = destination.droppableId as Task["status"]
+    setTasks((prev) => prev.map((task) =>
+      task.id === draggableId
+        ? { ...task, status: newStatus, order: newOrder }
         : task
-    )
-    
-    setTasks(updatedTasks)
+    ))
 
     try {
       const response = await fetch(
@@ -129,9 +124,9 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            status: destination.droppableId as Task["status"],
+            status: newStatus,
             order: newOrder,
-            updatedAt: taskToUpdate.updatedAt // 保持原来的更新时间
+            updatedAt: taskToUpdate.updatedAt
           }),
         }
       )
@@ -139,14 +134,16 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       if (!response.ok) {
         throw new Error("更新失败")
       }
-    } catch (error) {
+
+      const updatedTask = await response.json()
       setTasks((prev) => prev.map((task) =>
-        String(task.id) === draggableId
-          ? { 
-              ...task, 
-              status: source.droppableId as Task["status"],
-              order: taskToUpdate.order 
-            }
+        task.id === draggableId ? updatedTask : task
+      ))
+    } catch (error) {
+      // 回滚到原始状态
+      setTasks((prev) => prev.map((task) =>
+        task.id === draggableId
+          ? { ...task, status: source.droppableId as Task["status"], order: taskToUpdate.order }
           : task
       ))
       

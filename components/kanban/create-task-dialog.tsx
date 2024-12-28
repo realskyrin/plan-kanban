@@ -26,14 +26,14 @@ interface CreateTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   projectId: string
-  status: "todo" | "in_progress" | "done"
+  status: "TODO" | "IN_PROGRESS" | "DONE"
   onTaskCreated: () => void
 }
 
 const priorityOptions = [
-  { value: "low", label: "低优先级" },
-  { value: "medium", label: "中优先级" },
-  { value: "high", label: "高优先级" },
+  { value: "LOW", label: "低优先级" },
+  { value: "MEDIUM", label: "中优先级" },
+  { value: "HIGH", label: "高优先级" },
 ] as const
 
 export function CreateTaskDialog({
@@ -46,12 +46,12 @@ export function CreateTaskDialog({
   const { toast } = useToast()
   const [form, setForm] = useState<{
     title: string
-    description: string
-    priority: "low" | "medium" | "high"
+    description: string | null
+    priority: "LOW" | "MEDIUM" | "HIGH"
   }>({
     title: "",
-    description: "",
-    priority: "low",
+    description: null,
+    priority: "LOW",
   })
 
   const handleSubmit = async () => {
@@ -74,8 +74,7 @@ export function CreateTaskDialog({
           ...form,
           status,
           projectId,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          order: 1000, // 默认顺序
         }),
       })
 
@@ -85,8 +84,8 @@ export function CreateTaskDialog({
       onOpenChange(false)
       setForm({
         title: "",
-        description: "",
-        priority: "low",
+        description: null,
+        priority: "LOW",
       })
       toast({
         title: "成功",
@@ -125,11 +124,11 @@ export function CreateTaskDialog({
             <Label htmlFor="description">任务描述</Label>
             <Textarea
               id="description"
-              value={form.description}
+              value={form.description || ""}
               onChange={(e) =>
                 setForm((prev) => ({
                   ...prev,
-                  description: e.target.value,
+                  description: e.target.value || null,
                 }))
               }
             />
@@ -138,7 +137,7 @@ export function CreateTaskDialog({
             <Label htmlFor="priority">优先级</Label>
             <Select
               value={form.priority}
-              onValueChange={(value: "low" | "medium" | "high") =>
+              onValueChange={(value: "LOW" | "MEDIUM" | "HIGH") =>
                 setForm((prev) => ({ ...prev, priority: value }))
               }
             >
