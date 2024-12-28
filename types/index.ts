@@ -2,7 +2,7 @@ export interface Project {
   id: string
   title: string
   description: string
-  status: "active" | "completed" | "archived"
+  status: "ACTIVE" | "COMPLETED" | "ARCHIVED"
   createdAt: string
   updatedAt: string
 }
@@ -11,7 +11,7 @@ export interface Task {
   id: string
   title: string
   description: string
-  priority: "low" | "medium" | "high"
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
   projectId: string
   status: string
   createdAt: string

@@ -54,7 +54,7 @@ export function CreateProjectDialog() {
       await createProject({
         title: values.title,
         description: values.description || "",
-        status: "active",
+        status: "ACTIVE",
       })
       toast({
         title: "成功",

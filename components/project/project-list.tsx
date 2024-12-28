@@ -7,7 +7,7 @@ interface Project {
   id: string
   title: string
   description: string
-  status: "active" | "completed" | "archived"
+  status: "ACTIVE" | "COMPLETED" | "ARCHIVED"
   createdAt: string
   updatedAt: string
 }

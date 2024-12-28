@@ -30,7 +30,7 @@ interface Project {
   id: string
   title: string
   description: string
-  status: "active" | "completed" | "archived"
+  status: "ACTIVE" | "COMPLETED" | "ARCHIVED"
   createdAt: string
   updatedAt: string
 }
@@ -50,12 +50,12 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
   })
 
   const statusMap = {
-    active: { label: "进行中", className: "text-green-600" },
-    completed: { label: "已完成", className: "text-blue-600" },
-    archived: { label: "已归档", className: "text-gray-600" },
+    ACTIVE: { label: "进行中", className: "text-green-600" },
+    COMPLETED: { label: "已完成", className: "text-blue-600" },
+    ARCHIVED: { label: "已归档", className: "text-gray-600" },
   } as const
 
-  const { label, className } = statusMap[project.status as keyof typeof statusMap] || statusMap.active
+  const { label, className } = statusMap[project.status] || statusMap.ACTIVE
 
   const handleEditSubmit = async () => {
     await onUpdate(project.id, editForm)
@@ -153,9 +153,9 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
                   }))
                 }
               >
-                <option value="active">进行中</option>
-                <option value="completed">已完成</option>
-                <option value="archived">已归档</option>
+                <option value="ACTIVE">进行中</option>
+                <option value="COMPLETED">已完成</option>
+                <option value="ARCHIVED">已归档</option>
               </select>
             </div>
           </div>
