@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       data: {
         title: json.title,
         description: json.description,
+        status: "ACTIVE",
       },
     });
     return NextResponse.json(project);
