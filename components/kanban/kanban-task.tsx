@@ -105,7 +105,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
           <Card 
             className={cn(
               "border shadow-sm transition-all cursor-pointer hover:shadow-md",
-              snapshot.isDragging && "shadow-lg"
+              snapshot.isDragging && "shadow-lg opacity-60"
             )}
             onClick={() => setIsViewDialogOpen(true)}
           >
