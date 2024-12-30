@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { formatDistanceToNow } from "date-fns"
 import { zhCN } from "date-fns/locale"
-import { useState } from "react"
+import { useState, useRef, useCallback } from "react"
 import { EditTaskDialog } from "./edit-task-dialog"
 import { toast } from "@/lib/toast"
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { ToastAction } from "@/components/ui/toast"
 
 interface Task {
   id: string
@@ -66,26 +67,91 @@ interface KanbanTaskProps {
 export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
+  const [deletedTask, setDeletedTask] = useState<Task | null>(null)
+  const deleteTimeoutRef = useRef<number>()
+  const taskRef = useRef<Task | null>(null)
+
+  const handleRestore = useCallback(() => {
+    console.log('Restore clicked', { taskRef: taskRef.current, timeoutRef: deleteTimeoutRef.current })
+    
+    // 使用 taskRef 而不是 deletedTask
+    if (!taskRef.current) return
+
+    // 清除删除定时器
+    if (deleteTimeoutRef.current) {
+      window.clearTimeout(deleteTimeoutRef.current)
+      deleteTimeoutRef.current = undefined
+    }
+
+    // 恢复 UI
+    setDeletedTask(null)
+    onUpdate()
+    
+    toast.success({
+      title: "成功",
+      description: "任务已恢复",
+    })
+  }, [onUpdate]) // 移除 deletedTask 依赖
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`/api/tasks/${task.id}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) throw new Error("删除失败")
-
+      console.log('Delete clicked', { task })
+      // 保存任务到 ref 中
+      taskRef.current = task
+      // 先从 UI 移除
+      setDeletedTask(task)
       onUpdate()
+
+      // 显示 toast 并设置延迟删除
       toast.success({
         title: "成功",
         description: "任务已删除",
+        duration: 5000,
+        action: (
+          <ToastAction altText="撤回" onClick={handleRestore}>
+            撤回
+          </ToastAction>
+        ),
       })
+
+      // 设置定时器，5秒后真正从数据库删除
+      deleteTimeoutRef.current = window.setTimeout(async () => {
+        console.log('Executing delete from database', { taskId: task.id, taskRef: taskRef.current })
+        try {
+          const response = await fetch(`/api/tasks/${task.id}`, {
+            method: "DELETE",
+          })
+          if (!response.ok) throw new Error("删除失败")
+          
+          // 删除成功后清除引用
+          deleteTimeoutRef.current = undefined
+          taskRef.current = null
+        } catch (error) {
+          console.error('Delete from database failed', error)
+          toast.error({
+            title: "错误",
+            description: "删除任务失败",
+          })
+          // 如果删除失败，恢复 UI
+          setDeletedTask(null)
+          taskRef.current = null
+          onUpdate()
+        }
+      }, 5000)
+
     } catch (error) {
+      console.error('Delete operation failed', error)
       toast.error({
         title: "错误",
         description: "删除任务失败",
       })
+      taskRef.current = null
     }
+  }
+
+  // 如果任务已被删除（在 UI 中隐藏），不渲染任何内容
+  if (deletedTask?.id === task.id) {
+    return null
   }
 
   return (

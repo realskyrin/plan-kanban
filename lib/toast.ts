@@ -15,6 +15,7 @@ export const toast = {
       title: options.title,
       description: options.description,
       duration: options.duration || 3000,
+      action: options.action,
     })
   },
 
@@ -24,6 +25,7 @@ export const toast = {
       description: options.description,
       duration: options.duration || 5000,
       variant: "destructive",
+      action: options.action,
     })
   },
 
@@ -32,6 +34,7 @@ export const toast = {
       title: options.title,
       description: options.description,
       duration: options.duration || 3000,
+      action: options.action,
     })
   },
 
@@ -41,6 +44,7 @@ export const toast = {
       description: options.description,
       duration: options.duration || 3000,
       variant: options.variant,
+      action: options.action,
     })
   },
 } 
