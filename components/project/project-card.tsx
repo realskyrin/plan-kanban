@@ -69,87 +69,92 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
     setDeleteConfirmation("")
   }
 
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation()
+  }
+
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <Link
-          href={`/project/${project.id}`}
-          className="font-semibold hover:underline"
-        >
-          {project.title}
-        </Link>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">打开菜单</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-              编辑项目
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              className="text-red-600"
-              onClick={() => setIsDeleteDialogOpen(true)}
-            >
-              删除项目
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {project.description || "暂无描述"}
-        </p>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <span className={`text-sm ${className}`}>{label}</span>
-        <span className="text-sm text-muted-foreground">
-          更新于{" "}
-          {formatDistanceToNow(new Date(project.updatedAt), {
-            addSuffix: true,
-            locale: zhCN,
-          })}
-        </span>
-      </CardFooter>
+    <Link href={`/project/${project.id}`} className="block">
+      <Card className="transition-shadow hover:shadow-md">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <span className="font-semibold">{project.title}</span>
+          <div onClick={stopPropagation}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">打开菜单</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+                  编辑项目
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  className="text-red-600"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  删除项目
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {project.description || "暂无描述"}
+          </p>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <span className={`text-sm ${className}`}>{label}</span>
+          <span className="text-sm text-muted-foreground">
+            更新于{" "}
+            {formatDistanceToNow(new Date(project.updatedAt), {
+              addSuffix: true,
+              locale: zhCN,
+            })}
+          </span>
+        </CardFooter>
+      </Card>
 
-      <EditProjectDialog
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        project={project}
-        onProjectUpdated={onUpdate}
-      />
+      <div onClick={stopPropagation}>
+        <EditProjectDialog
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          project={project}
+          onProjectUpdated={onUpdate}
+        />
 
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>删除项目</DialogTitle>
-            <DialogDescription>
-              此操作无法撤销。请输入项目名称 <span className="font-semibold text-red-500">{project.title}</span> 以确认删除。
-            </DialogDescription>
-          </DialogHeader>
-          <Input
-            placeholder="输入项目名称"
-            value={deleteConfirmation}
-            onChange={(e) => setDeleteConfirmation(e.target.value)}
-          />
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-            >
-              取消
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-            >
-              删除项目
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </Card>
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>删除项目</DialogTitle>
+              <DialogDescription>
+                此操作无法撤销。请输入项目名称 <span className="font-semibold text-red-500">{project.title}</span> 以确认删除。
+              </DialogDescription>
+            </DialogHeader>
+            <Input
+              placeholder="输入项目名称"
+              value={deleteConfirmation}
+              onChange={(e) => setDeleteConfirmation(e.target.value)}
+            />
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+              >
+                取消
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+              >
+                删除项目
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </Link>
   )
 } 
