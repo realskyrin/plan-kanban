@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react"
 import { KanbanColumn } from "./kanban-column"
 import { toast } from "@/lib/toast"
-import { DragDropContext, DropResult } from "@hello-pangea/dnd"
+import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd"
 import { useConfetti } from "@/hooks/use-confetti"
 import { cn } from "@/lib/utils"
 import { Trash2 } from "lucide-react"
@@ -29,7 +29,6 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
-  const [isOverDelete, setIsOverDelete] = useState(false)
   const { fireConfetti } = useConfetti()
   const deleteTimeoutRef = useRef<number>()
   const taskRef = useRef<Task | null>(null)
@@ -184,16 +183,16 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
   const onDragEnd = async (result: DropResult) => {
     setIsDragging(false)
-    setIsOverDelete(false)
 
     const { destination, source, draggableId } = result
 
     if (!destination) {
-      // 检查是否在删除区域上方结束拖拽
-      if (isOverDelete) {
-        await handleDelete(draggableId)
-        return
-      }
+      return
+    }
+
+    // 检查是否拖拽到删除区域
+    if (destination.droppableId === "DELETE_ZONE") {
+      await handleDelete(draggableId)
       return
     }
 
@@ -299,27 +298,30 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
   return (
     <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      {isDragging && (
-        <div
-          className={cn(
-            "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-64 h-24 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200",
-            isOverDelete
-              ? "border-red-500 bg-red-100 shadow-[0_0_20px_rgba(239,68,68,0.5)]"
-              : "border-red-300 bg-white",
-            !isDragging && "opacity-0 pointer-events-none"
-          )}
-          onMouseEnter={() => setIsOverDelete(true)}
-          onMouseLeave={() => setIsOverDelete(false)}
-        >
-          <div className="flex flex-col items-center space-y-2 text-red-500">
-            <Trash2 className={cn(
-              "w-6 h-6 transition-transform duration-200",
-              isOverDelete && "scale-125"
-            )} />
-            <span className="text-sm font-medium">拖到此处删除</span>
+      <Droppable droppableId="DELETE_ZONE">
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className={cn(
+              "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-64 h-24 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200",
+              snapshot.isDraggingOver
+                ? "border-red-500 bg-red-100 shadow-[0_0_20px_rgba(239,68,68,0.5)]"
+                : "border-red-300 bg-white",
+              !isDragging && "opacity-0 pointer-events-none"
+            )}
+          >
+            <div className="flex flex-col items-center space-y-2 text-red-500">
+              <Trash2 className={cn(
+                "w-6 h-6 transition-transform duration-200",
+                snapshot.isDraggingOver && "scale-125"
+              )} />
+              <span className="text-sm font-medium">拖到此处删除</span>
+            </div>
+            {provided.placeholder}
           </div>
-        </div>
-      )}
+        )}
+      </Droppable>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {Object.entries(columns).map(([columnId, column]) => (
           <KanbanColumn
