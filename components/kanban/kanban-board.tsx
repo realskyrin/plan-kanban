@@ -304,21 +304,23 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={cn(
-              "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-64 h-24 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200",
+              "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-64 h-24 border-2 border-dashed rounded-lg transition-all duration-200 overflow-hidden",
               snapshot.isDraggingOver
                 ? "border-red-500 bg-red-100 shadow-[0_0_20px_rgba(239,68,68,0.5)]"
                 : "border-red-300 bg-white",
               !isDragging && "opacity-0 pointer-events-none"
             )}
           >
-            <div className="flex flex-col items-center space-y-2 text-red-500">
-              <Trash2 className={cn(
-                "w-6 h-6 transition-transform duration-200",
-                snapshot.isDraggingOver && "scale-125"
-              )} />
-              <span className="text-sm font-medium">拖到此处删除</span>
-            </div>
             {provided.placeholder}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="flex flex-col items-center space-y-2 text-red-500">
+                <Trash2 className={cn(
+                  "w-6 h-6 transition-transform duration-200",
+                  snapshot.isDraggingOver && "scale-125"
+                )} />
+                <span className="text-sm font-medium">拖到此处删除</span>
+              </div>
+            </div>
           </div>
         )}
       </Droppable>
