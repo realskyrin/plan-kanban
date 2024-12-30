@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import { KanbanColumn } from "./kanban-column"
 import { toast } from "@/lib/toast"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import { useConfetti } from "@/hooks/use-confetti"
 import { cn } from "@/lib/utils"
 import { Trash2 } from "lucide-react"
+import { ToastAction } from "@/components/ui/toast"
 
 interface Task {
   id: string
@@ -30,24 +31,26 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [isOverDelete, setIsOverDelete] = useState(false)
   const { fireConfetti } = useConfetti()
+  const deleteTimeoutRef = useRef<number>()
+  const taskRef = useRef<Task | null>(null)
 
   const columns = {
     TODO: {
       title: "待办",
       tasks: tasks
-        .filter((task) => task.status === "TODO")
+        .filter((task): task is Task => task !== null && task.status === "TODO")
         .sort((a, b) => a.order - b.order),
     },
     IN_PROGRESS: {
       title: "进行中",
       tasks: tasks
-        .filter((task) => task.status === "IN_PROGRESS")
+        .filter((task): task is Task => task !== null && task.status === "IN_PROGRESS")
         .sort((a, b) => a.order - b.order),
     },
     DONE: {
       title: "已完成",
       tasks: tasks
-        .filter((task) => task.status === "DONE")
+        .filter((task): task is Task => task !== null && task.status === "DONE")
         .sort((a, b) => a.order - b.order),
     },
   }
@@ -56,7 +59,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     try {
       const response = await fetch(`/api/tasks?projectId=${projectId}`)
       const data = await response.json()
-      setTasks(data)
+      setTasks(data.filter((task: Task | null): task is Task => task !== null))
     } catch (error) {
       toast.error({
         title: "错误",
@@ -71,24 +74,107 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     fetchTasks()
   }, [projectId])
 
+  const handleRestore = useCallback(() => {
+    console.log('Restore clicked', { taskRef: taskRef.current, timeoutRef: deleteTimeoutRef.current })
+    
+    if (!taskRef.current) return
+
+    // 清除删除定时器
+    if (deleteTimeoutRef.current) {
+      window.clearTimeout(deleteTimeoutRef.current)
+      deleteTimeoutRef.current = undefined
+    }
+
+    // 恢复 UI
+    const taskToRestore = taskRef.current
+    setTasks(prev => {
+      // 确保不会添加重复的任务
+      if (prev.some(task => task?.id === taskToRestore.id)) {
+        return prev
+      }
+      return [...prev, taskToRestore]
+    })
+    taskRef.current = null
+    
+    toast.success({
+      title: "成功",
+      description: "任务已恢复",
+    })
+  }, [])
+
   const handleDelete = async (taskId: string) => {
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: "DELETE",
-      })
+      console.log('Delete clicked', { taskId })
+      const taskToDelete = tasks.find(t => t.id === taskId)
+      if (!taskToDelete) return
 
-      if (!response.ok) throw new Error("删除失败")
+      // 清除之前的定时器（如果存在）
+      if (deleteTimeoutRef.current) {
+        window.clearTimeout(deleteTimeoutRef.current)
+        deleteTimeoutRef.current = undefined
+      }
 
-      setTasks((prev) => prev.filter((task) => task.id !== taskId))
+      // 保存任务到 ref 中
+      taskRef.current = taskToDelete
+      
+      // 先从 UI 移除
+      setTasks(prev => prev.filter(task => task.id !== taskId))
+
+      // 显示 toast 并设置延迟删除
       toast.success({
         title: "成功",
         description: "任务已删除",
+        duration: 5000,
+        action: (
+          <ToastAction altText="撤回" onClick={handleRestore}>
+            撤回
+          </ToastAction>
+        ),
       })
+
+      // 设置定时器，5秒后真正从数据库删除
+      deleteTimeoutRef.current = window.setTimeout(async () => {
+        console.log('Executing delete from database', { taskId, taskRef: taskRef.current })
+        try {
+          const response = await fetch(`/api/tasks/${taskId}`, {
+            method: "DELETE",
+          })
+          
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || "删除失败")
+          }
+          
+          // 删除成功后清除引用
+          deleteTimeoutRef.current = undefined
+          taskRef.current = null
+        } catch (error) {
+          console.error('Delete from database failed', error)
+          toast.error({
+            title: "错误",
+            description: "删除任务失败",
+          })
+          // 如果删除失败，恢复 UI
+          if (taskRef.current) {
+            const taskToRestore = taskRef.current as Task
+            setTasks(prev => [...prev, taskToRestore])
+          }
+          taskRef.current = null
+        }
+      }, 5000)
+
     } catch (error) {
+      console.error('Delete operation failed', error)
       toast.error({
         title: "错误",
         description: "删除任务失败",
       })
+      // 发生错误时恢复 UI
+      if (taskRef.current) {
+        const taskToRestore = taskRef.current as Task
+        setTasks(prev => [...prev, taskToRestore])
+      }
+      taskRef.current = null
     }
   }
 
