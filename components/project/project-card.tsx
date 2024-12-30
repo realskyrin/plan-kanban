@@ -10,10 +10,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { formatDistanceToNow } from "date-fns"
 import { zhCN } from "date-fns/locale"
 import { useState } from "react"
 import { EditProjectDialog } from "./edit-project-dialog"
+import { useToast } from "@/components/ui/use-toast"
 
 interface Project {
   id: string
@@ -32,6 +42,9 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [deleteConfirmation, setDeleteConfirmation] = useState("")
+  const { toast } = useToast()
 
   const statusMap = {
     ACTIVE: { label: "进行中", className: "text-green-600" },
@@ -40,6 +53,21 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
   } as const
 
   const { label, className } = statusMap[project.status] || statusMap.ACTIVE
+
+  const handleDelete = async () => {
+    if (deleteConfirmation !== project.title) {
+      toast({
+        variant: "destructive",
+        title: "项目名称不匹配",
+        description: "请输入正确的项目名称以确认删除",
+      })
+      return
+    }
+
+    await onDelete(project.id)
+    setIsDeleteDialogOpen(false)
+    setDeleteConfirmation("")
+  }
 
   return (
     <Card>
@@ -63,7 +91,7 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
             </DropdownMenuItem>
             <DropdownMenuItem 
               className="text-red-600"
-              onClick={() => onDelete(project.id)}
+              onClick={() => setIsDeleteDialogOpen(true)}
             >
               删除项目
             </DropdownMenuItem>
@@ -92,6 +120,36 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
         project={project}
         onProjectUpdated={onUpdate}
       />
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>删除项目</DialogTitle>
+            <DialogDescription>
+              此操作无法撤销。请输入项目名称 <span className="font-semibold text-red-500">{project.title}</span> 以确认删除。
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            placeholder="输入项目名称"
+            value={deleteConfirmation}
+            onChange={(e) => setDeleteConfirmation(e.target.value)}
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              取消
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+            >
+              删除项目
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 } 
