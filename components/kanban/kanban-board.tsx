@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { KanbanColumn } from "./kanban-column"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/toast"
 import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import { useConfetti } from "@/hooks/use-confetti"
 import { cn } from "@/lib/utils"
@@ -30,7 +30,6 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [isOverDelete, setIsOverDelete] = useState(false)
   const { fireConfetti } = useConfetti()
-  const { toast } = useToast()
 
   const columns = {
     TODO: {
@@ -59,10 +58,9 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       const data = await response.json()
       setTasks(data)
     } catch (error) {
-      toast({
+      toast.error({
         title: "错误",
         description: "获取任务列表失败",
-        variant: "destructive",
       })
     } finally {
       setIsLoading(false)
@@ -82,15 +80,14 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       if (!response.ok) throw new Error("删除失败")
 
       setTasks((prev) => prev.filter((task) => task.id !== taskId))
-      toast({
+      toast.success({
         title: "成功",
         description: "任务已删除",
       })
     } catch (error) {
-      toast({
+      toast.error({
         title: "错误",
         description: "删除任务失败",
-        variant: "destructive",
       })
     }
   }
@@ -194,10 +191,9 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           : task
       ))
       
-      toast({
+      toast.error({
         title: "错误",
         description: "更新任务状态失败",
-        variant: "destructive",
       })
     }
   }

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import type { Project } from "@/types"
 import * as api from "@/lib/api"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/toast"
 
 interface ProjectContextType {
   projects: Project[]
@@ -18,17 +18,15 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
 
   async function refreshProjects() {
     try {
       const data = await api.getProjects()
       setProjects(data)
     } catch (error) {
-      toast({
+      toast.error({
         title: "错误",
         description: "获取项目列表失败",
-        variant: "destructive",
       })
     } finally {
       setIsLoading(false)
@@ -43,15 +41,14 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
           project.id === id ? updatedProject : project
         )
       )
-      toast({
+      toast.success({
         title: "成功",
         description: "项目已更新",
       })
     } catch (error) {
-      toast({
+      toast.error({
         title: "错误",
         description: "更新项目失败",
-        variant: "destructive",
       })
       throw error
     }
@@ -61,15 +58,14 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     try {
       await api.deleteProject(id)
       setProjects((prev) => prev.filter((project) => project.id !== id))
-      toast({
+      toast.success({
         title: "成功",
         description: "项目已删除",
       })
     } catch (error) {
-      toast({
+      toast.error({
         title: "错误",
         description: "删除项目失败",
-        variant: "destructive",
       })
       throw error
     }

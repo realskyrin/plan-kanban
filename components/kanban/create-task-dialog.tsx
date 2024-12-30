@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/toast"
 import {
   Select,
   SelectContent,
@@ -43,7 +43,6 @@ export function CreateTaskDialog({
   status,
   onTaskCreated,
 }: CreateTaskDialogProps) {
-  const { toast } = useToast()
   const [form, setForm] = useState<{
     title: string
     description: string | null
@@ -56,10 +55,9 @@ export function CreateTaskDialog({
 
   const handleSubmit = async () => {
     if (!form.title.trim()) {
-      toast({
+      toast.error({
         title: "错误",
         description: "任务标题不能为空",
-        variant: "destructive",
       })
       return
     }
@@ -87,15 +85,14 @@ export function CreateTaskDialog({
         description: null,
         priority: "LOW",
       })
-      toast({
+      toast.success({
         title: "成功",
         description: "任务已创建",
       })
     } catch (error) {
-      toast({
+      toast.error({
         title: "错误",
         description: "创建任务失败",
-        variant: "destructive",
       })
     }
   }

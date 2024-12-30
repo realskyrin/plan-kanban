@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/toast"
 import { ToastAction } from "@/components/ui/toast"
 import {
   Select,
@@ -51,7 +51,6 @@ export function EditProjectDialog({
   project,
   onProjectUpdated,
 }: EditProjectDialogProps) {
-  const { toast } = useToast()
   const [form, setForm] = useState<{
     title: string
     description: string
@@ -69,19 +68,15 @@ export function EditProjectDialog({
         updatedAt: new Date().toISOString(),
       })
       onOpenChange(false)
-      toast({
-        title: "成功",
-        description: "项目已更新",
-      })
     } catch (error) {
       const errorMessage = process.env.DEBUG_PROD === 'true'
         ? `更新项目失败: ${error instanceof Error ? error.message : '未知错误'}`
         : '更新项目失败，请稍后重试'
 
-      toast({
-        variant: "destructive",
+      toast.custom({
         title: "错误",
         description: errorMessage,
+        variant: "destructive",
         action: process.env.DEBUG_PROD === 'true' ? (
           <ToastAction altText="复制错误信息" onClick={() => {
             navigator.clipboard.writeText(String(error))

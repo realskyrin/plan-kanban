@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/toast"
 import { createProject } from "@/lib/api"
 import { Plus } from "lucide-react"
 import { useState } from "react"
@@ -39,7 +39,6 @@ const formSchema = z.object({
 
 export function CreateProjectDialog() {
   const [open, setOpen] = useState(false)
-  const { toast } = useToast()
   const { refreshProjects } = useProject()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,7 +55,7 @@ export function CreateProjectDialog() {
         description: values.description || "",
         status: "ACTIVE",
       })
-      toast({
+      toast.success({
         title: "成功",
         description: "项目创建成功",
       })
@@ -64,10 +63,9 @@ export function CreateProjectDialog() {
       setOpen(false)
       refreshProjects()
     } catch (error) {
-      toast({
+      toast.error({
         title: "错误",
         description: "项目创建失败",
-        variant: "destructive",
       })
     }
   }

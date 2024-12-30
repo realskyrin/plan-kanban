@@ -19,7 +19,7 @@ import { formatDistanceToNow } from "date-fns"
 import { zhCN } from "date-fns/locale"
 import { useState } from "react"
 import { EditTaskDialog } from "./edit-task-dialog"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "@/lib/toast"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import {
@@ -66,7 +66,6 @@ interface KanbanTaskProps {
 export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
-  const { toast } = useToast()
 
   const handleDelete = async () => {
     try {
@@ -77,15 +76,14 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
       if (!response.ok) throw new Error("删除失败")
 
       onUpdate()
-      toast({
+      toast.success({
         title: "成功",
         description: "任务已删除",
       })
     } catch (error) {
-      toast({
+      toast.error({
         title: "错误",
         description: "删除任务失败",
-        variant: "destructive",
       })
     }
   }
