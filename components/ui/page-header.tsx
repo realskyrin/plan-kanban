@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Github } from "lucide-react"
 import { useTheme } from "next-themes"
 
 interface PageHeaderProps {
@@ -23,6 +23,15 @@ export function PageHeader({
       {showBack && children}
       <h1 className="text-lg font-medium">{title}</h1>
       <div className="flex-1" />
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => window.open('https://github.com/realskyrin/plan-kanban', '_blank')}
+        className="h-9 w-9"
+      >
+        <Github className="h-4 w-4" />
+        <span className="sr-only">GitHub 仓库</span>
+      </Button>
       <Button
         variant="ghost"
         size="icon"
