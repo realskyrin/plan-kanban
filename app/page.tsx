@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <main>
       <PageHeader title="PlanKanban" />
-      <div className="container mx-auto py-6 pt-20">
+      <div className="p-4 pt-[4.5rem] md:p-8 md:pt-[4.5rem]">
         <ProjectList 
           projects={projects}
           onUpdateProject={updateProject}

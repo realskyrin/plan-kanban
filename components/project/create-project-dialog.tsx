@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -37,7 +36,11 @@ const formSchema = z.object({
   description: z.string().optional(),
 })
 
-export function CreateProjectDialog() {
+interface CreateProjectDialogProps {
+  children?: React.ReactNode
+}
+
+export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
   const [open, setOpen] = useState(false)
   const { refreshProjects } = useProject()
   const form = useForm<z.infer<typeof formSchema>>({
@@ -73,10 +76,10 @@ export function CreateProjectDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <div className="flex items-center justify-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
           <Plus className="mr-2 h-4 w-4" />
-          新建项目
-        </Button>
+          <span>新建项目</span>
+        </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
