@@ -88,7 +88,7 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
 
   return (
     <Link href={`/project/${project.id}`} className="block">
-      <Card className="transition-shadow hover:shadow-md">
+      <Card className="transition-shadow hover:shadow-md border border-gray-600/60">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <span className="font-semibold">{project.title}</span>
           <div onClick={stopPropagation}>

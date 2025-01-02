@@ -32,8 +32,8 @@ export function KanbanColumn({ id, title, tasks, projectId, onTaskUpdate }: Kanb
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   
   return (
-    <div className="flex flex-col rounded-lg border bg-card text-card-foreground">
-      <div className="flex items-center justify-between p-4 border-b">
+    <div className="flex flex-col rounded-lg border border-gray-600/60 bg-card text-card-foreground">
+      <div className="flex items-center justify-between p-4 border-b border-gray-600/60">
         <div className="flex items-center space-x-2">
           <h3 className="font-semibold">{title}</h3>
           <span className="text-muted-foreground">({tasks.length})</span>
