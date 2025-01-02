@@ -1,0 +1,49 @@
+{
+  "app": {
+    "title": "Plan Kanban",
+    "description": "A simple and efficient Kanban task management tool"
+  },
+  "common": {
+    "create": "Create",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "loading": "Loading...",
+    "github": "GitHub Repository",
+    "toggleTheme": "Toggle Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeDefault": "Default",
+    "switchLanguage": "Switch Language"
+  },
+  "nav": {
+    "home": "Home",
+    "projects": "Projects"
+  },
+  "project": {
+    "title": "Projects",
+    "createProject": "Create Project",
+    "projectName": "Project Name",
+    "description": "Description",
+    "noProjects": "No projects found",
+    "deleteConfirm": "Are you sure you want to delete this project?",
+    "createSuccess": "Project created successfully",
+    "deleteSuccess": "Project deleted successfully",
+    "updateSuccess": "Project updated successfully"
+  },
+  "board": {
+    "addCard": "Add Card",
+    "editCard": "Edit Card",
+    "deleteCard": "Delete Card",
+    "cardTitle": "Card Title",
+    "cardDescription": "Card Description",
+    "createSuccess": "Card created successfully",
+    "deleteSuccess": "Card deleted successfully",
+    "updateSuccess": "Card updated successfully"
+  },
+  "error": {
+    "languageSwitch": "Failed to switch language",
+    "tryAgain": "Please try again later"
+  }
+} 

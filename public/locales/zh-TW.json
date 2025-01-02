@@ -1,0 +1,49 @@
+{
+  "app": {
+    "title": "看板計劃",
+    "description": "一個簡單高效的看板任務管理工具"
+  },
+  "common": {
+    "create": "創建",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "save": "保存",
+    "loading": "載入中...",
+    "github": "GitHub 倉庫",
+    "toggleTheme": "切換主題",
+    "themeLight": "淺色",
+    "themeDark": "深色",
+    "themeDefault": "暗淡",
+    "switchLanguage": "切換語言"
+  },
+  "nav": {
+    "home": "首頁",
+    "projects": "專案"
+  },
+  "project": {
+    "title": "專案",
+    "createProject": "創建專案",
+    "projectName": "專案名稱",
+    "description": "描述",
+    "noProjects": "暫無專案",
+    "deleteConfirm": "確定要刪除這個專案嗎？",
+    "createSuccess": "專案創建成功",
+    "deleteSuccess": "專案刪除成功",
+    "updateSuccess": "專案更新成功"
+  },
+  "board": {
+    "addCard": "添加卡片",
+    "editCard": "編輯卡片",
+    "deleteCard": "刪除卡片",
+    "cardTitle": "卡片標題",
+    "cardDescription": "卡片描述",
+    "createSuccess": "卡片創建成功",
+    "deleteSuccess": "卡片刪除成功",
+    "updateSuccess": "卡片更新成功"
+  },
+  "error": {
+    "languageSwitch": "切換語言失敗",
+    "tryAgain": "請稍後重試"
+  }
+} 
