@@ -6,7 +6,7 @@ import { InitOptions } from "i18next";
 
 const i18nConfig: InitOptions = {
   fallbackLng: "en",
-  supportedLngs: ["en", "zh-CN", "zh-TW"],
+  supportedLngs: ["en", "zh", "zh-CN", "zh-TW"],
   ns: ["translation"],
   defaultNS: "translation",
   debug: process.env.NODE_ENV === "development",
