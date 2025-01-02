@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { formatDistanceToNow } from "date-fns"
-import { zhCN } from "date-fns/locale"
+import { zhCN, enUS, zhTW } from "date-fns/locale"
 import { useState, useRef, useCallback } from "react"
 import { EditTaskDialog } from "./edit-task-dialog"
 import { toast } from "@/lib/toast"
@@ -51,7 +51,7 @@ interface KanbanTaskProps {
 }
 
 export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [deletedTask, setDeletedTask] = useState<Task | null>(null)
@@ -72,6 +72,18 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
       color: "bg-red-800",
     },
   } as const
+
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'zh':
+      case 'zh-CN':
+        return zhCN
+      case 'zh-TW':
+        return zhTW
+      default:
+        return enUS
+    }
+  }
 
   const handleRestore = useCallback(() => {
     console.log('Restore clicked', { taskRef: taskRef.current, timeoutRef: deleteTimeoutRef.current })
@@ -223,7 +235,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                   {t('common.updatedAt')} {" "}
                   {formatDistanceToNow(new Date(task.updatedAt), {
                     addSuffix: true,
-                    locale: zhCN,
+                    locale: getDateLocale(),
                   })}
                 </span>
               </div>
@@ -243,7 +255,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                   {t('common.createdAt')} {" "}
                   {formatDistanceToNow(new Date(task.createdAt), {
                     addSuffix: true,
-                    locale: zhCN,
+                    locale: getDateLocale(),
                   })}
                 </DialogDescription>
               </DialogHeader>
@@ -268,7 +280,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                     {t('common.updatedAt')} {" "}
                     {formatDistanceToNow(new Date(task.updatedAt), {
                       addSuffix: true,
-                      locale: zhCN,
+                      locale: getDateLocale(),
                     })}
                   </span>
                 </div>

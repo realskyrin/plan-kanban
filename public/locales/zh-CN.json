@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "看板计划",
+    "title": "PlanKanban",
     "description": "一个简单高效的看板任务管理工具"
   },
   "common": {
@@ -52,9 +52,9 @@
     "taskDescription": "任务描述",
     "priority": "优先级",
     "selectPriority": "选择优先级",
-    "lowPriority": "低优先级",
-    "mediumPriority": "中优先级",
-    "highPriority": "高优先级",
+    "lowPriority": "低",
+    "mediumPriority": "中",
+    "highPriority": "高",
     "noDescription": "暂无描述",
     "createTaskDescription": "为你的项目创建新任务",
     "editTaskDescription": "编辑任务详情",

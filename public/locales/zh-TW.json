@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "看板計劃",
+    "title": "PlanKanban",
     "description": "一個簡單高效的看板任務管理工具"
   },
   "common": {
@@ -52,9 +52,9 @@
     "taskDescription": "任務描述",
     "priority": "優先級",
     "selectPriority": "選擇優先級",
-    "lowPriority": "低優先級",
-    "mediumPriority": "中優先級",
-    "highPriority": "高優先級",
+    "lowPriority": "低",
+    "mediumPriority": "中",
+    "highPriority": "高",
     "noDescription": "暫無描述",
     "createTaskDescription": "為你的項目創建新任務",
     "editTaskDescription": "編輯任務詳情",

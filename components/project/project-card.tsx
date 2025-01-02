@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { formatDistanceToNow } from "date-fns"
-import { zhCN } from "date-fns/locale"
+import { enUS, zhCN, zhTW } from "date-fns/locale"
 import { useState } from "react"
 import { EditProjectDialog } from "./edit-project-dialog"
 import { useToast } from "@/components/ui/use-toast"
@@ -45,7 +45,19 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState("")
   const { toast } = useToast()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+
+  const getDateLocale = () => {
+    switch (i18n.language) {
+      case 'zh':
+      case 'zh-CN':
+        return zhCN
+      case 'zh-TW':
+        return zhTW
+      default:
+        return enUS
+    }
+  }
 
   const statusMap = {
     ACTIVE: { label: t('common.inProgress'), className: "text-green-600" },
@@ -112,7 +124,7 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
             {t('common.updatedAt')} {" "}
             {formatDistanceToNow(new Date(project.updatedAt), {
               addSuffix: true,
-              locale: zhCN,
+              locale: getDateLocale(),
             })}
           </span>
         </CardFooter>

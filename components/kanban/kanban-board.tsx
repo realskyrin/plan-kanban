@@ -308,7 +308,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
             className={cn(
               "fixed top-4 left-1/2 -translate-x-1/2 z-50 w-64 h-24 border-2 border-dashed rounded-lg transition-all duration-200 overflow-hidden",
               snapshot.isDraggingOver
-                ? "border-red-500 bg-red-100 shadow-[0_0_20px_rgba(239,68,68,0.5)]"
+                ? "border-red-500 bg-red-300 shadow-[0_0_20px_rgba(239,68,68,0.5)]"
                 : "border-red-300 bg-white",
               !isDragging && "opacity-0 pointer-events-none"
             )}
