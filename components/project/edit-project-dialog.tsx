@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useTranslation } from "react-i18next"
 
 interface Project {
   id: string
@@ -39,18 +40,20 @@ interface EditProjectDialogProps {
   onProjectUpdated: (projectId: string, updatedData: Partial<Project>) => Promise<void>
 }
 
-const statusOptions = [
-  { value: "ACTIVE", label: "进行中" },
-  { value: "COMPLETED", label: "已完成" },
-  { value: "ARCHIVED", label: "已归档" },
-] as const
-
 export function EditProjectDialog({
   open,
   onOpenChange,
   project,
   onProjectUpdated,
 }: EditProjectDialogProps) {
+  const { t } = useTranslation()
+  
+  const statusOptions = [
+    { value: "ACTIVE", label: t('common.inProgress') },
+    { value: "COMPLETED", label: t('common.completed') },
+    { value: "ARCHIVED", label: t('common.archived') },
+  ] as const
+
   const [form, setForm] = useState<{
     title: string
     description: string
@@ -70,18 +73,18 @@ export function EditProjectDialog({
       onOpenChange(false)
     } catch (error) {
       const errorMessage = process.env.DEBUG_PROD === 'true'
-        ? `更新项目失败: ${error instanceof Error ? error.message : '未知错误'}`
-        : '更新项目失败，请稍后重试'
+        ? `更新项目失败: ${error instanceof Error ? error.message : t('common.unknownError')}`
+        : t('common.updateProjectFailed')
 
       toast.custom({
-        title: "错误",
+        title: t('common.error'),
         description: errorMessage,
         variant: "destructive",
         action: process.env.DEBUG_PROD === 'true' ? (
-          <ToastAction altText="复制错误信息" onClick={() => {
+          <ToastAction altText={t('common.copyErrorInfo')} onClick={() => {
             navigator.clipboard.writeText(String(error))
           }}>
-            复制错误信息
+            {t('common.copyErrorInfo')}
           </ToastAction>
         ) : undefined
       })
@@ -92,14 +95,14 @@ export function EditProjectDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>编辑项目</DialogTitle>
+          <DialogTitle>{t('common.editProject')}</DialogTitle>
           <DialogDescription>
-            修改项目信息，完成后点击保存。
+            {t('common.modifyProjectInfo')}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="title">项目名称</Label>
+            <Label htmlFor="title">{t('common.projectName')}</Label>
             <Input
               id="title"
               value={form.title}
@@ -109,7 +112,7 @@ export function EditProjectDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="description">项目描述</Label>
+            <Label htmlFor="description">{t('common.projectDescription')}</Label>
             <Textarea
               id="description"
               value={form.description}
@@ -122,7 +125,7 @@ export function EditProjectDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="status">项目状态</Label>
+            <Label htmlFor="status">{t('common.projectStatus')}</Label>
             <Select
               value={form.status}
               onValueChange={(value: "ACTIVE" | "COMPLETED" | "ARCHIVED") =>
@@ -130,7 +133,7 @@ export function EditProjectDialog({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="选择状态" />
+                <SelectValue placeholder={t('common.selectStatus')} />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -144,9 +147,9 @@ export function EditProjectDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit}>保存</Button>
+          <Button onClick={handleSubmit}>{t('common.save')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

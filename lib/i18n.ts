@@ -23,6 +23,15 @@ const i18nConfig: InitOptions = {
   },
   react: {
     useSuspense: false
+  },
+  saveMissing: true,
+  missingKeyHandler: (lng, ns, key) => {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`Missing translation key: ${key} for language: ${lng} in namespace: ${ns}`);
+    }
+  },
+  parseMissingKeyHandler: (key) => {
+    return key;
   }
 };
 

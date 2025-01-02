@@ -28,6 +28,7 @@ import { createProject } from "@/lib/api"
 import { Plus } from "lucide-react"
 import { useState } from "react"
 import { useProject } from "@/components/providers/project-provider"
+import { useTranslation } from "react-i18next"
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -41,6 +42,7 @@ interface CreateProjectDialogProps {
 }
 
 export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { refreshProjects } = useProject()
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,16 +61,16 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
         status: "ACTIVE",
       })
       toast.success({
-        title: "成功",
-        description: "项目创建成功",
+        title: t('common.success'),
+        description: t('common.projectCreated'),
       })
       form.reset()
       setOpen(false)
       refreshProjects()
     } catch (error) {
       toast.error({
-        title: "错误",
-        description: "项目创建失败",
+        title: t('common.error'),
+        description: t('common.projectCreationFailed'),
       })
     }
   }
@@ -78,14 +80,14 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
       <DialogTrigger asChild>
         <div className="flex items-center justify-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-accent/50 transition-colors">
           <Plus className="mr-2 h-4 w-4" />
-          <span>新建项目</span>
+          <span>{t('common.createProject')}</span>
         </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>新建项目</DialogTitle>
+          <DialogTitle>{t('common.createProject')}</DialogTitle>
           <DialogDescription>
-            创建一个新的项目来组织和管理你的任务
+            {t('common.createProjectDescription')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -95,12 +97,12 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>项目名称</FormLabel>
+                  <FormLabel>{t('common.projectName')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="输入项目名称" {...field} />
+                    <Input placeholder={t('common.enterProjectName')} {...field} />
                   </FormControl>
                   <FormDescription>
-                    一个简短而有描述性的名称
+                    {t('common.aShortAndDescriptiveName')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -111,16 +113,16 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>项目描述</FormLabel>
+                  <FormLabel>{t('common.projectDescription')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="输入项目描述"
+                      placeholder={t('common.enterProjectDescription')}
                       className="resize-none"
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    详细描述项目的目标和范围
+                    {t('common.detailedDescriptionOfProjectObjectivesAndScope')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -128,9 +130,9 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
             />
             <div className="flex justify-end space-x-4">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                取消
+                {t('common.cancel')}
               </Button>
-              <Button type="submit">创建项目</Button>
+              <Button type="submit">{t('common.createProject')}</Button>
             </div>
           </form>
         </Form>

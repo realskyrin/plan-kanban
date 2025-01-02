@@ -30,7 +30,7 @@ interface KanbanColumnProps {
 
 export function KanbanColumn({ id, title, tasks, projectId, onTaskUpdate }: KanbanColumnProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-
+  
   return (
     <div className="flex flex-col rounded-lg border bg-card text-card-foreground">
       <div className="flex items-center justify-between p-4 border-b">

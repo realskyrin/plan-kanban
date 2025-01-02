@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/lib/toast"
+import { useTranslation } from "react-i18next"
 import {
   Select,
   SelectContent,
@@ -41,18 +42,13 @@ interface EditTaskDialogProps {
   onTaskUpdated: () => void
 }
 
-const priorityOptions = [
-  { value: "LOW", label: "低优先级" },
-  { value: "MEDIUM", label: "中优先级" },
-  { value: "HIGH", label: "高优先级" },
-] as const
-
 export function EditTaskDialog({
   open,
   onOpenChange,
   task,
   onTaskUpdated,
 }: EditTaskDialogProps) {
+  const { t } = useTranslation()
   const [form, setForm] = useState<{
     title: string
     description: string | null
@@ -62,6 +58,12 @@ export function EditTaskDialog({
     description: task.description,
     priority: task.priority,
   })
+
+  const priorityOptions = [
+    { value: "LOW", label: t('common.lowPriority') },
+    { value: "MEDIUM", label: t('common.mediumPriority') },
+    { value: "HIGH", label: t('common.highPriority') },
+  ] as const
 
   const handleSubmit = async () => {
     try {
@@ -76,18 +78,18 @@ export function EditTaskDialog({
         }),
       })
 
-      if (!response.ok) throw new Error("更新失败")
+      if (!response.ok) throw new Error(t('common.updateFailed'))
 
       onTaskUpdated()
       onOpenChange(false)
       toast.success({
-        title: "成功",
-        description: "任务已更新",
+        title: t('common.success'),
+        description: t('common.taskUpdated'),
       })
     } catch (error) {
       toast.error({
-        title: "错误",
-        description: "更新任务失败",
+        title: t('common.error'),
+        description: t('common.updateFailed'),
       })
     }
   }
@@ -96,14 +98,14 @@ export function EditTaskDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>编辑任务</DialogTitle>
+          <DialogTitle>{t('common.editTask')}</DialogTitle>
           <DialogDescription>
-            修改任务信息，完成后点击保存。
+            {t('common.editTaskDescription')}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="title">任务标题</Label>
+            <Label htmlFor="title">{t('common.taskTitle')}</Label>
             <Input
               id="title"
               value={form.title}
@@ -113,7 +115,7 @@ export function EditTaskDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="description">任务描述</Label>
+            <Label htmlFor="description">{t('common.taskDescription')}</Label>
             <Textarea
               id="description"
               value={form.description || ""}
@@ -126,7 +128,7 @@ export function EditTaskDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="priority">优先级</Label>
+            <Label htmlFor="priority">{t('common.priority')}</Label>
             <Select
               value={form.priority}
               onValueChange={(value: "LOW" | "MEDIUM" | "HIGH") =>
@@ -134,7 +136,7 @@ export function EditTaskDialog({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="选择优先级" />
+                <SelectValue placeholder={t('common.selectPriority')} />
               </SelectTrigger>
               <SelectContent>
                 {priorityOptions.map((option) => (
@@ -148,9 +150,9 @@ export function EditTaskDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit}>保存</Button>
+          <Button onClick={handleSubmit}>{t('common.save')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

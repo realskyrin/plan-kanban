@@ -30,6 +30,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ToastAction } from "@/components/ui/toast"
+import { useTranslation } from "react-i18next"
 
 interface Task {
   id: string
@@ -43,21 +44,6 @@ interface Task {
   updatedAt: string
 }
 
-const priorityConfig = {
-  LOW: {
-    label: "低优先级",
-    color: "bg-green-800",
-  },
-  MEDIUM: {
-    label: "中优先级",
-    color: "bg-yellow-500",
-  },
-  HIGH: {
-    label: "高优先级",
-    color: "bg-red-800",
-  },
-} as const
-
 interface KanbanTaskProps {
   task: Task
   index: number
@@ -65,11 +51,27 @@ interface KanbanTaskProps {
 }
 
 export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
+  const { t } = useTranslation()
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [deletedTask, setDeletedTask] = useState<Task | null>(null)
   const deleteTimeoutRef = useRef<number>()
   const taskRef = useRef<Task | null>(null)
+
+  const priorityConfig = {
+    LOW: {
+      label: t('common.lowPriority'),
+      color: "bg-green-800",
+    },
+    MEDIUM: {
+      label: t('common.mediumPriority'),
+      color: "bg-yellow-500",
+    },
+    HIGH: {
+      label: t('common.highPriority'),
+      color: "bg-red-800",
+    },
+  } as const
 
   const handleRestore = useCallback(() => {
     console.log('Restore clicked', { taskRef: taskRef.current, timeoutRef: deleteTimeoutRef.current })
@@ -88,8 +90,8 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
     onUpdate()
     
     toast.success({
-      title: "成功",
-      description: "任务已恢复",
+      title: t('common.success'),
+      description: t('common.taskRestored'),
     })
   }, [onUpdate]) // 移除 deletedTask 依赖
 
@@ -104,12 +106,12 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
 
       // 显示 toast 并设置延迟删除
       toast.success({
-        title: "成功",
-        description: "任务已删除",
+        title: t('common.success'),
+        description: t('common.taskDeleted'),
         duration: 5000,
         action: (
-          <ToastAction altText="撤回" onClick={handleRestore}>
-            撤回
+          <ToastAction altText={t('common.undo')} onClick={handleRestore}>
+            {t('common.undo')}
           </ToastAction>
         ),
       })
@@ -121,7 +123,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
           const response = await fetch(`/api/tasks/${task.id}`, {
             method: "DELETE",
           })
-          if (!response.ok) throw new Error("删除失败")
+          if (!response.ok) throw new Error(t('common.deleteFailed'))
           
           // 删除成功后清除引用
           deleteTimeoutRef.current = undefined
@@ -129,8 +131,8 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
         } catch (error) {
           console.error('Delete from database failed', error)
           toast.error({
-            title: "错误",
-            description: "删除任务失败",
+            title: t('common.error'),
+            description: t('common.deleteFailed'),
           })
           // 如果删除失败，恢复 UI
           setDeletedTask(null)
@@ -142,8 +144,8 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
     } catch (error) {
       console.error('Delete operation failed', error)
       toast.error({
-        title: "错误",
-        description: "删除任务失败",
+        title: t('common.error'),
+        description: t('common.deleteFailed'),
       })
       taskRef.current = null
     }
@@ -178,7 +180,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                   <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">打开菜单</span>
+                    <span className="sr-only">{t('common.openMenu')}</span>
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -187,7 +189,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                     e.stopPropagation()
                     setIsEditDialogOpen(true)
                   }}>
-                    编辑任务
+                    {t('common.editTask')}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-red-600"
@@ -196,14 +198,14 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                       handleDelete()
                     }}
                   >
-                    删除任务
+                    {t('common.deleteTask')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground line-clamp-2">
-                {task.description || "暂无描述"}
+                {task.description || t('common.noDescription')}
               </p>
             </CardContent>
             <CardFooter className="flex flex-col space-y-2">
@@ -218,7 +220,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                   {priorityConfig[task.priority].label}
                 </Badge>
                 <span className="text-sm text-muted-foreground">
-                  更新于{" "}
+                  {t('common.updatedAt')} {" "}
                   {formatDistanceToNow(new Date(task.updatedAt), {
                     addSuffix: true,
                     locale: zhCN,
@@ -238,7 +240,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
               <DialogHeader>
                 <DialogTitle>{task.title}</DialogTitle>
                 <DialogDescription>
-                  创建于{" "}
+                  {t('common.createdAt')} {" "}
                   {formatDistanceToNow(new Date(task.createdAt), {
                     addSuffix: true,
                     locale: zhCN,
@@ -247,9 +249,9 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium mb-2">任务描述</h4>
+                  <h4 className="text-sm font-medium mb-2">{t('common.taskDescription')}</h4>
                   <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {task.description || "暂无描述"}
+                    {task.description || t('common.noDescription')}
                   </p>
                 </div>
                 <div className="flex items-center justify-between">
@@ -263,7 +265,7 @@ export function KanbanTask({ task, index, onUpdate }: KanbanTaskProps) {
                     {priorityConfig[task.priority].label}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    更新于{" "}
+                    {t('common.updatedAt')} {" "}
                     {formatDistanceToNow(new Date(task.updatedAt), {
                       addSuffix: true,
                       locale: zhCN,

@@ -24,7 +24,7 @@ import { zhCN } from "date-fns/locale"
 import { useState } from "react"
 import { EditProjectDialog } from "./edit-project-dialog"
 import { useToast } from "@/components/ui/use-toast"
-
+import { useTranslation } from "react-i18next"
 interface Project {
   id: string
   title: string
@@ -45,11 +45,12 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState("")
   const { toast } = useToast()
+  const { t } = useTranslation()
 
   const statusMap = {
-    ACTIVE: { label: "进行中", className: "text-green-600" },
-    COMPLETED: { label: "已完成", className: "text-blue-600" },
-    ARCHIVED: { label: "已归档", className: "text-gray-600" },
+    ACTIVE: { label: t('common.inProgress'), className: "text-green-600" },
+    COMPLETED: { label: t('common.completed'), className: "text-blue-600" },
+    ARCHIVED: { label: t('common.archived'), className: "text-gray-600" },
   } as const
 
   const { label, className } = statusMap[project.status] || statusMap.ACTIVE
@@ -58,8 +59,8 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
     if (deleteConfirmation !== project.title) {
       toast({
         variant: "destructive",
-        title: "项目名称不匹配",
-        description: "请输入正确的项目名称以确认删除",
+        title: t('common.projectNameMismatch'),
+        description: t('common.pleaseEnterCorrectProjectNameToConfirmDelete'),
       })
       return
     }
@@ -82,19 +83,19 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">打开菜单</span>
+                  <span className="sr-only">{t('common.openMenu')}</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-                  编辑项目
+                  {t('common.editProject')}
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   className="text-red-600"
                   onClick={() => setIsDeleteDialogOpen(true)}
                 >
-                  删除项目
+                  {t('common.deleteProject')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -102,13 +103,13 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {project.description || "暂无描述"}
+            {project.description || t('common.noDescription')}
           </p>
         </CardContent>
         <CardFooter className="flex justify-between">
           <span className={`text-sm ${className}`}>{label}</span>
           <span className="text-sm text-muted-foreground">
-            更新于{" "}
+            {t('common.updatedAt')} {" "}
             {formatDistanceToNow(new Date(project.updatedAt), {
               addSuffix: true,
               locale: zhCN,
@@ -128,13 +129,14 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>删除项目</DialogTitle>
+              <DialogTitle>{t('common.deleteProject')}</DialogTitle>
               <DialogDescription>
-                此操作无法撤销。请输入项目名称 <span className="font-semibold text-red-500">{project.title}</span> 以确认删除。
+                {t('common.thisOperationCannotBeUndone')}
+                {t('common.pleaseEnterProjectName')} <span className="font-semibold text-red-500">{project.title}</span> {t('common.toConfirmDelete')}
               </DialogDescription>
             </DialogHeader>
             <Input
-              placeholder="输入项目名称"
+              placeholder={t('common.enterProjectName')}
               value={deleteConfirmation}
               onChange={(e) => setDeleteConfirmation(e.target.value)}
             />
@@ -143,13 +145,13 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
                 variant="outline"
                 onClick={() => setIsDeleteDialogOpen(false)}
               >
-                取消
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleDelete}
               >
-                删除项目
+                {t('common.deleteProject')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -157,4 +159,4 @@ export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
       </div>
     </Link>
   )
-} 
+}

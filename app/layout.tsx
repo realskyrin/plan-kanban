@@ -17,20 +17,31 @@ export const viewport: Viewport = {
   themeColor: '#000000',
 }
 
-export const metadata: Metadata = {
-  title: 'app.title',
-  description: 'app.description',
-  manifest: '/manifest.json',
-  icons: {
-    apple: [
-      { url: '/icons/icon-192x192.png' },
-    ],
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'app.title',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = headers();
+  const acceptLanguage = headersList.get('accept-language') || '';
+  const defaultLang = acceptLanguage.includes('zh') 
+    ? acceptLanguage.includes('TW') ? 'zh-TW' : 'zh-CN'
+    : 'en';
+
+  // 根据语言加载对应的翻译文件
+  const translations = await import(`@/public/locales/${defaultLang}.json`);
+
+  return {
+    title: translations.default.app.title,
+    description: translations.default.app.description,
+    manifest: '/manifest.json',
+    icons: {
+      apple: [
+        { url: '/icons/icon-192x192.png' },
+      ],
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'default',
+      title: translations.default.app.title,
+    },
+  }
 }
 
 export default function RootLayout({
@@ -56,7 +67,7 @@ export default function RootLayout({
         >
           <I18nProvider>
             <ProjectProvider>
-              <PageHeader title="app.title" />
+              <PageHeader />
               {children}
             </ProjectProvider>
           </I18nProvider>
@@ -65,4 +76,4 @@ export default function RootLayout({
       </body>
     </html>
   )
-} 
+}

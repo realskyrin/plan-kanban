@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/lib/toast"
+import { useTranslation } from "react-i18next"
 import {
   Select,
   SelectContent,
@@ -30,12 +31,6 @@ interface CreateTaskDialogProps {
   onTaskCreated: () => void
 }
 
-const priorityOptions = [
-  { value: "LOW", label: "低优先级" },
-  { value: "MEDIUM", label: "中优先级" },
-  { value: "HIGH", label: "高优先级" },
-] as const
-
 export function CreateTaskDialog({
   open,
   onOpenChange,
@@ -43,6 +38,8 @@ export function CreateTaskDialog({
   status,
   onTaskCreated,
 }: CreateTaskDialogProps) {
+  const { t } = useTranslation()
+
   const [form, setForm] = useState<{
     title: string
     description: string | null
@@ -53,11 +50,17 @@ export function CreateTaskDialog({
     priority: "LOW",
   })
 
+  const priorityOptions = [
+    { value: "LOW", label: t('common.lowPriority') },
+    { value: "MEDIUM", label: t('common.mediumPriority') },
+    { value: "HIGH", label: t('common.highPriority') },
+  ] as const
+
   const handleSubmit = async () => {
     if (!form.title.trim()) {
       toast.error({
-        title: "错误",
-        description: "任务标题不能为空",
+        title: t('common.error'),
+        description: t('common.taskTitleEmpty'),
       })
       return
     }
@@ -76,7 +79,7 @@ export function CreateTaskDialog({
         }),
       })
 
-      if (!response.ok) throw new Error("创建失败")
+      if (!response.ok) throw new Error(t('common.createFailed'))
 
       onTaskCreated()
       onOpenChange(false)
@@ -86,13 +89,13 @@ export function CreateTaskDialog({
         priority: "LOW",
       })
       toast.success({
-        title: "成功",
-        description: "任务已创建",
+        title: t('common.success'),
+        description: t('common.taskCreated'),
       })
     } catch (error) {
       toast.error({
-        title: "错误",
-        description: "创建任务失败",
+        title: t('common.error'),
+        description: t('common.createFailed'),
       })
     }
   }
@@ -101,14 +104,14 @@ export function CreateTaskDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>创建任务</DialogTitle>
+          <DialogTitle>{t('common.createTask')}</DialogTitle>
           <DialogDescription>
-            填写任务信息，完成后点击创建。
+            {t('common.createTaskDescription')}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="title">任务标题</Label>
+            <Label htmlFor="title">{t('common.taskTitle')}</Label>
             <Input
               id="title"
               value={form.title}
@@ -118,7 +121,7 @@ export function CreateTaskDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="description">任务描述</Label>
+            <Label htmlFor="description">{t('common.taskDescription')}</Label>
             <Textarea
               id="description"
               value={form.description || ""}
@@ -131,7 +134,7 @@ export function CreateTaskDialog({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="priority">优先级</Label>
+            <Label htmlFor="priority">{t('common.priority')}</Label>
             <Select
               value={form.priority}
               onValueChange={(value: "LOW" | "MEDIUM" | "HIGH") =>
@@ -139,7 +142,7 @@ export function CreateTaskDialog({
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="选择优先级" />
+                <SelectValue placeholder={t('common.selectPriority')} />
               </SelectTrigger>
               <SelectContent>
                 {priorityOptions.map((option) => (
@@ -153,9 +156,9 @@ export function CreateTaskDialog({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            取消
+            {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit}>创建</Button>
+          <Button onClick={handleSubmit}>{t('common.create')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import type { Project } from "@/types"
 import * as api from "@/lib/api"
 import { toast } from "@/lib/toast"
+import { useTranslation } from "react-i18next"
 
 interface ProjectContextType {
   projects: Project[]
@@ -16,6 +17,7 @@ interface ProjectContextType {
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
 
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation()
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -25,8 +27,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       setProjects(data)
     } catch (error) {
       toast.error({
-        title: "错误",
-        description: "获取项目列表失败",
+        title: t('common.error'),
+        description: t('common.getProjectListFailed'),
       })
     } finally {
       setIsLoading(false)
@@ -42,13 +44,13 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         )
       )
       toast.success({
-        title: "成功",
-        description: "项目已更新",
+        title: t('common.success'),
+        description: t('common.projectUpdated'),
       })
     } catch (error) {
       toast.error({
-        title: "错误",
-        description: "更新项目失败",
+        title: t('common.error'),
+        description: t('common.updateProjectFailed'),
       })
       throw error
     }
@@ -59,13 +61,13 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       await api.deleteProject(id)
       setProjects((prev) => prev.filter((project) => project.id !== id))
       toast.success({
-        title: "成功",
-        description: "项目已删除",
+        title: t('common.success'),
+        description: t('common.projectDeleted'),
       })
     } catch (error) {
       toast.error({
-        title: "错误",
-        description: "删除项目失败",
+        title: t('common.error'),
+        description: t('common.deleteProjectFailed'),
       })
       throw error
     }

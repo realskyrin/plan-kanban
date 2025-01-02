@@ -8,6 +8,7 @@ import { useConfetti } from "@/hooks/use-confetti"
 import { cn } from "@/lib/utils"
 import { Trash2 } from "lucide-react"
 import { ToastAction } from "@/components/ui/toast"
+import { useTranslation } from "react-i18next"
 
 interface Task {
   id: string
@@ -26,6 +27,7 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ projectId }: KanbanBoardProps) {
+  const { t } = useTranslation()
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
@@ -35,19 +37,19 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
   const columns = {
     TODO: {
-      title: "待办",
+      title: t('common.todo'),
       tasks: tasks
         .filter((task): task is Task => task !== null && task.status === "TODO")
         .sort((a, b) => a.order - b.order),
     },
     IN_PROGRESS: {
-      title: "进行中",
+      title: t('common.inProgress'),
       tasks: tasks
         .filter((task): task is Task => task !== null && task.status === "IN_PROGRESS")
         .sort((a, b) => a.order - b.order),
     },
     DONE: {
-      title: "已完成",
+      title: t('common.done'),
       tasks: tasks
         .filter((task): task is Task => task !== null && task.status === "DONE")
         .sort((a, b) => a.order - b.order),
@@ -61,8 +63,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       setTasks(data.filter((task: Task | null): task is Task => task !== null))
     } catch (error) {
       toast.error({
-        title: "错误",
-        description: "获取任务列表失败",
+        title: t('common.error'),
+        description: t('common.getTaskListFailed'),
       })
     } finally {
       setIsLoading(false)
@@ -96,8 +98,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     taskRef.current = null
     
     toast.success({
-      title: "成功",
-      description: "任务已恢复",
+      title: t('common.success'),
+      description: t('common.taskRestored'),
     })
   }, [])
 
@@ -121,12 +123,12 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
 
       // 显示 toast 并设置延迟删除
       toast.success({
-        title: "成功",
-        description: "任务已删除",
+        title: t('common.success'),
+        description: t('common.taskDeleted'),
         duration: 5000,
         action: (
           <ToastAction altText="撤回" onClick={handleRestore}>
-            撤回
+            {t('common.undo')}
           </ToastAction>
         ),
       })
@@ -141,7 +143,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
           
           if (!response.ok) {
             const errorData = await response.json()
-            throw new Error(errorData.error || "删除失败")
+            throw new Error(errorData.error || t('common.deleteFailed'))
           }
           
           // 删除成功后清除引用
@@ -150,8 +152,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         } catch (error) {
           console.error('Delete from database failed', error)
           toast.error({
-            title: "错误",
-            description: "删除任务失败",
+            title: t('common.error'),
+            description: t('common.deleteFailed'),
           })
           // 如果删除失败，恢复 UI
           if (taskRef.current) {
@@ -165,8 +167,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     } catch (error) {
       console.error('Delete operation failed', error)
       toast.error({
-        title: "错误",
-        description: "删除任务失败",
+        title: t('common.error'),
+        description: t('common.deleteFailed'),
       })
       // 发生错误时恢复 UI
       if (taskRef.current) {
@@ -261,7 +263,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       )
 
       if (!response.ok) {
-        throw new Error("更新失败")
+        throw new Error(t('common.updateFailed'))
       }
 
       const updatedTask = await response.json()
@@ -277,8 +279,8 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       ))
       
       toast.error({
-        title: "错误",
-        description: "更新任务状态失败",
+        title: t('common.error'),
+        description: t('common.updateFailed'),
       })
     }
   }
@@ -318,7 +320,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
                   "w-6 h-6 transition-transform duration-200",
                   snapshot.isDraggingOver && "scale-125"
                 )} />
-                <span className="text-sm font-medium">拖到此处删除</span>
+                <span className="text-sm font-medium">{t('common.dragToDelete')}</span>
               </div>
             </div>
           </div>
