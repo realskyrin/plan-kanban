@@ -340,4 +340,4 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       </div>
     </DragDropContext>
   )
-} 
+}
