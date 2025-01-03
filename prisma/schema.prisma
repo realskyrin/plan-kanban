@@ -7,27 +7,65 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  password      String
+  name          String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  userProjects  UserProject[]
+  ownedProjects Project[]     @relation("ProjectOwner")
+  assignedTasks Task[]        @relation("TaskAssignee")
+  assignedUserProjects UserProject[] @relation("UserProjectAssigner")
+}
+
+model UserProject {
+  userId      String
+  projectId   String
+  role        UserRole     @default(VIEWER)
+  assignedAt  DateTime     @default(now())
+  assignedBy  String?
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedByUser User?     @relation("UserProjectAssigner", fields: [assignedBy], references: [id])
+
+  @@id([userId, projectId])
+  @@index([projectId])
+  @@index([userId])
+}
+
 model Project {
   id          String        @id @default(uuid())
   title       String
   description String?
+  ownerId     String
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   status      ProjectStatus @default(ACTIVE)
   tasks       Task[]
+  owner       User          @relation("ProjectOwner", fields: [ownerId], references: [id])
+  members     UserProject[]
+
+  @@index([ownerId])
 }
 
 model Task {
   id          String       @id @default(uuid())
   title       String
   description String?
-  order       Int          @default(0)
+  order       Int         @default(0)
   projectId   String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  status      TaskStatus   @default(TODO)
+  assigneeId  String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  status      TaskStatus  @default(TODO)
   priority    TaskPriority @default(MEDIUM)
-  project     Project      @relation(fields: [projectId], references: [id])
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee    User?       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  @@index([projectId])
+  @@index([assigneeId])
 }
 
 enum ProjectStatus {
@@ -46,4 +84,10 @@ enum TaskPriority {
   LOW
   MEDIUM
   HIGH
+}
+
+enum UserRole {
+  OWNER
+  EDITOR
+  VIEWER
 }

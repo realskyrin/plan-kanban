@@ -4,126 +4,117 @@ import { requireAuth } from '@/lib/auth'
 import { z } from 'zod'
 import {
   canViewProject,
-  canEditProject,
-  canDeleteProject,
+  canEditTask,
+  canDeleteTask,
   PermissionError,
 } from '@/lib/permissions'
 
-const updateProjectSchema = z.object({
+const updateTaskSchema = z.object({
   title: z.string().min(1).optional(),
   description: z.string().optional(),
-  status: z.enum(['ACTIVE', 'COMPLETED', 'ARCHIVED']).optional(),
+  status: z.enum(['TODO', 'IN_PROGRESS', 'DONE']).optional(),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional(),
+  assigneeId: z.string().optional().nullable(),
+  order: z.number().optional(),
 })
 
-// 获取单个项目
+// 获取单个任务
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string; taskId: string } }
 ) {
   return requireAuth(request, async (userId) => {
-    const { id } = params
+    const { id, taskId } = params
 
     // 检查权限
     if (!(await canViewProject(userId, id))) {
       throw new PermissionError()
     }
 
-    const project = await prisma.project.findUnique({
-      where: { id },
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
       include: {
-        owner: {
+        assignee: {
           select: {
             id: true,
             name: true,
             email: true,
           },
         },
-        members: {
-          select: {
-            role: true,
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
-        tasks: {
-          orderBy: {
-            order: 'asc',
-          },
-          include: {
-            assignee: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
-            },
-          },
-        },
       },
     })
 
-    if (!project) {
-      return new NextResponse(JSON.stringify({ error: 'Project not found' }), {
+    if (!task || task.projectId !== id) {
+      return new NextResponse(JSON.stringify({ error: 'Task not found' }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' },
       })
     }
 
-    return new NextResponse(JSON.stringify(project), {
+    return new NextResponse(JSON.stringify(task), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
   })
 }
 
-// 更新项目
+// 更新任务
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string; taskId: string } }
 ) {
   return requireAuth(request, async (userId) => {
     try {
-      const { id } = params
+      const { id, taskId } = params
       const body = await request.json()
-      const data = updateProjectSchema.parse(body)
+      const data = updateTaskSchema.parse(body)
 
       // 检查权限
-      if (!(await canEditProject(userId, id))) {
+      if (!(await canEditTask(userId, id))) {
         throw new PermissionError()
       }
 
-      const project = await prisma.project.update({
-        where: { id },
+      // 检查任务是否存在且属于该项目
+      const existingTask = await prisma.task.findUnique({
+        where: { id: taskId },
+      })
+
+      if (!existingTask || existingTask.projectId !== id) {
+        return new NextResponse(JSON.stringify({ error: 'Task not found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+
+      // 如果更新了状态，需要重新计算顺序
+      if (data.status && data.status !== existingTask.status) {
+        const maxOrder = await prisma.task.aggregate({
+          where: {
+            projectId: id,
+            status: data.status,
+          },
+          _max: {
+            order: true,
+          },
+        })
+        data.order = (maxOrder._max.order || 0) + 1
+      }
+
+      const task = await prisma.task.update({
+        where: { id: taskId },
         data,
         include: {
-          owner: {
+          assignee: {
             select: {
               id: true,
               name: true,
               email: true,
             },
           },
-          members: {
-            select: {
-              role: true,
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                },
-              },
-            },
-          },
         },
       })
 
-      return new NextResponse(JSON.stringify(project), {
+      return new NextResponse(JSON.stringify(task), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       })
@@ -153,22 +144,34 @@ export async function PATCH(
   })
 }
 
-// 删除项目
+// 删除任务
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string; taskId: string } }
 ) {
   return requireAuth(request, async (userId) => {
     try {
-      const { id } = params
+      const { id, taskId } = params
 
       // 检查权限
-      if (!(await canDeleteProject(userId, id))) {
+      if (!(await canDeleteTask(userId, id))) {
         throw new PermissionError()
       }
 
-      await prisma.project.delete({
-        where: { id },
+      // 检查任务是否存在且属于该项目
+      const task = await prisma.task.findUnique({
+        where: { id: taskId },
+      })
+
+      if (!task || task.projectId !== id) {
+        return new NextResponse(JSON.stringify({ error: 'Task not found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+
+      await prisma.task.delete({
+        where: { id: taskId },
       })
 
       return new NextResponse(null, { status: 204 })

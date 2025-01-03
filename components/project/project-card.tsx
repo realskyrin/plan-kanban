@@ -1,15 +1,19 @@
 "use client"
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { MoreHorizontal } from "lucide-react"
-import Link from "next/link"
+import { Project, Prisma } from '@prisma/client'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
+import { ProjectStatus } from '@prisma/client'
+import { Badge } from '@/components/ui/badge'
+import { MoreHorizontal } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 import {
   Dialog,
   DialogContent,
@@ -19,156 +23,266 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { formatDistanceToNow } from "date-fns"
-import { enUS, zhCN, zhTW } from "date-fns/locale"
-import { useState } from "react"
-import { EditProjectDialog } from "./edit-project-dialog"
-import { useToast } from "@/components/ui/use-toast"
-import { useTranslation } from "react-i18next"
-interface Project {
-  id: string
-  title: string
-  description: string
-  status: "ACTIVE" | "COMPLETED" | "ARCHIVED"
-  createdAt: string
-  updatedAt: string
+import { EditProjectDialog } from '@/components/project/edit-project-dialog'
+import { useState, useEffect } from 'react'
+import { toast } from '@/lib/toast'
+import { ProjectMembersDialog } from '@/components/project/project-members-dialog'
+import AvatarCircles from '@/components/ui/avatar-circles'
+import { useAuth } from '@/components/providers/auth-provider'
+import { useProject } from '@/components/providers/project-provider'
+import { updateProject } from '@/lib/api'
+import { useTranslation } from 'react-i18next'
+
+interface ProjectWithDetails extends Project {
+  _count: {
+    tasks: number
+  }
+  owner: {
+    id: string
+    name: string
+    email: string
+  }
+  members: {
+    role: 'OWNER' | 'EDITOR' | 'VIEWER'
+    user: {
+      id: string
+      name: string
+      email: string
+    }
+  }[]
 }
 
 interface ProjectCardProps {
-  project: Project
-  onDelete: (projectId: string) => Promise<void>
-  onUpdate: (projectId: string, updatedData: Partial<Project>) => Promise<void>
+  project: ProjectWithDetails
+  onDeleted?: () => void
 }
 
-export function ProjectCard({ project, onDelete, onUpdate }: ProjectCardProps) {
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [deleteConfirmation, setDeleteConfirmation] = useState("")
-  const { toast } = useToast()
-  const { t, i18n } = useTranslation()
+export function ProjectCard({ project, onDeleted }: ProjectCardProps) {
+  const router = useRouter()
+  const { user } = useAuth()
+  const { deleteProject, isOperationInProgress } = useProject()
+  const { t } = useTranslation()
+  const [projectData, setProjectData] = useState<ProjectWithDetails>(project)
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [showMembersDialog, setShowMembersDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [deleteConfirmName, setDeleteConfirmName] = useState('')
 
-  const getDateLocale = () => {
-    switch (i18n.language) {
-      case 'zh':
-      case 'zh-CN':
-        return zhCN
-      case 'zh-TW':
-        return zhTW
-      default:
-        return enUS
+  const isDeleting = isOperationInProgress('deleteProject')
+  const isUpdating = isOperationInProgress('updateProject')
+
+  const userRole = projectData.members.find(m => m.user.id === user?.id)?.role
+  const canEdit = userRole === 'OWNER' || userRole === 'EDITOR'
+  const canManageMembers = userRole === 'OWNER'
+
+  useEffect(() => {
+    setProjectData(project)
+  }, [project])
+
+  async function refreshProjectData() {
+    try {
+      const response = await fetch(`/api/projects/${projectData.id}`)
+      if (!response.ok) {
+        throw new Error(t('common.getProjectListFailed'))
+      }
+      const data = await response.json()
+      setProjectData(data)
+    } catch (error) {
+      toast.error({
+        title: error instanceof Error ? error.message : t('common.getProjectListFailed')
+      })
     }
   }
 
-  const statusMap = {
-    ACTIVE: { label: t('common.inProgress'), className: "text-green-600" },
-    COMPLETED: { label: t('common.completed'), className: "text-blue-600" },
-    ARCHIVED: { label: t('common.archived'), className: "text-gray-600" },
-  } as const
-
-  const { label, className } = statusMap[project.status] || statusMap.ACTIVE
-
-  const handleDelete = async () => {
-    if (deleteConfirmation !== project.title) {
-      toast({
-        variant: "destructive",
-        title: t('common.projectNameMismatch'),
-        description: t('common.pleaseEnterCorrectProjectNameToConfirmDelete'),
-      })
+  async function handleDelete() {
+    if (deleteConfirmName !== projectData.title) {
+      toast.error({ title: t('common.deleteNameMismatch') })
       return
     }
 
-    await onDelete(project.id)
-    setIsDeleteDialogOpen(false)
-    setDeleteConfirmation("")
+    try {
+      await deleteProject(projectData.id)
+      setShowDeleteDialog(false)
+      onDeleted?.()
+    } catch (error) {
+      console.error('Failed to delete project:', error)
+    }
   }
 
-  const stopPropagation = (e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleCardClick = (e: React.MouseEvent<HTMLElement>) => {
+    // 防止点击下拉菜单或其内部元素时触发卡片跳转
+    if (!(e.target instanceof Element)) return
+    
+    const target = e.target as Element
+    if (target.closest('.dropdown-trigger') || target.closest('[role="menu"]')) {
+      return
+    }
+    router.push(`/projects/${projectData.id}`)
+  }
+
+  const statusMap: Record<ProjectStatus, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
+    ACTIVE: { label: t('common.inProgress'), variant: 'default' },
+    COMPLETED: { label: t('common.completed'), variant: 'secondary' },
+    ARCHIVED: { label: t('common.archived'), variant: 'outline' },
   }
 
   return (
-    <Link href={`/project/${project.id}`} className="block">
-      <Card className="transition-shadow hover:shadow-md border border-gray-600/60">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <span className="font-semibold">{project.title}</span>
-          <div onClick={stopPropagation}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">{t('common.openMenu')}</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-                  {t('common.editProject')}
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  className="text-red-600"
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                >
-                  {t('common.deleteProject')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+    <>
+      <Card
+        className="group relative hover:shadow-md transition-shadow cursor-pointer"
+        onClick={handleCardClick}
+      >
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <h3 className="font-semibold leading-none tracking-tight">
+            {projectData.title}
+          </h3>
+          <div className="flex items-center gap-2">
+            <Badge variant={statusMap[projectData.status].variant}>
+              {statusMap[projectData.status].label}
+            </Badge>
+            {canEdit && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="h-8 w-8 p-0 dropdown-trigger"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">{t('common.openMenu')}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowEditDialog(true)
+                    }}
+                  >
+                    {t('common.editProject')}
+                  </DropdownMenuItem>
+                  {canManageMembers && (
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowMembersDialog(true)
+                      }}
+                    >
+                      {t('project.manageMembers')}
+                    </DropdownMenuItem>
+                  )}
+                  {canManageMembers && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setShowDeleteDialog(true)
+                        }}
+                      >
+                        {t('common.deleteProject')}
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {project.description || t('common.noDescription')}
-          </p>
+          <div className="text-sm text-muted-foreground">
+            {projectData.description || t('common.noDescription')}
+          </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <span className={`text-sm ${className}`}>{label}</span>
-          <span className="text-sm text-muted-foreground">
-            {t('common.updatedAt')} {" "}
-            {formatDistanceToNow(new Date(project.updatedAt), {
-              addSuffix: true,
-              locale: getDateLocale(),
-            })}
-          </span>
+          <div className="flex items-center gap-4">
+            <AvatarCircles
+              numPeople={projectData.members.length > 5 ? projectData.members.length - 5 : 0}
+              avatars={projectData.members.slice(0, 5).map(member => ({
+                name: member.user.name,
+                profileUrl: `/users/${member.user.id}`,
+              }))}
+              size={32}
+            />
+          </div>
         </CardFooter>
       </Card>
 
-      <div onClick={stopPropagation}>
-        <EditProjectDialog
-          open={isEditDialogOpen}
-          onOpenChange={setIsEditDialogOpen}
-          project={project}
-          onProjectUpdated={onUpdate}
-        />
+      <EditProjectDialog
+        project={{
+          id: projectData.id,
+          title: projectData.title,
+          description: projectData.description || '',
+          createdAt: new Date(projectData.createdAt).toDateString(),
+          updatedAt: new Date(projectData.updatedAt).toDateString(),
+          status: projectData.status,
+        }}
+        onProjectUpdated={async (projectId, updatedData) => {
+          await updateProject(projectId, updatedData)
+          const response = await fetch(`/api/projects/${projectId}`)
+          const updatedProject = await response.json()
+          setProjectData(updatedProject)
+        }}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        isUpdating={isUpdating}
+      />
 
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t('common.deleteProject')}</DialogTitle>
-              <DialogDescription>
-                {t('common.thisOperationCannotBeUndone')}
-                {t('common.pleaseEnterProjectName')} <span className="font-semibold text-red-500">{project.title}</span> {t('common.toConfirmDelete')}
-              </DialogDescription>
-            </DialogHeader>
-            <Input
-              placeholder={t('common.enterProjectName')}
-              value={deleteConfirmation}
-              onChange={(e) => setDeleteConfirmation(e.target.value)}
-            />
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsDeleteDialogOpen(false)}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-              >
-                {t('common.deleteProject')}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </Link>
+      <ProjectMembersDialog
+        project={projectData}
+        open={showMembersDialog}
+        onOpenChange={setShowMembersDialog}
+        onSuccess={refreshProjectData}
+      />
+
+      <Dialog 
+        open={showDeleteDialog} 
+        onOpenChange={(open) => {
+          if (!isDeleting) {
+            setShowDeleteDialog(open)
+            if (!open) {
+              setDeleteConfirmName('')
+            }
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('project.deleteProject')}</DialogTitle>
+            <DialogDescription>
+              {t('common.thisOperationCannotBeUndone')}
+              {t('common.pleaseEnterProjectName')} <span className="font-semibold text-red-500">{project.title}</span> {t('common.toConfirmDelete')}
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            placeholder={t('common.enterProjectName')}
+            value={deleteConfirmName}
+            onChange={(e) => setDeleteConfirmName(e.target.value)}
+            disabled={isDeleting}
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={isDeleting}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleDelete()
+              }}
+              disabled={isDeleting || deleteConfirmName !== projectData.title}
+            >
+              {isDeleting ? t('common.deleting') : t('common.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

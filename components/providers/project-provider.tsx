@@ -12,6 +12,7 @@ interface ProjectContextType {
   refreshProjects: () => Promise<void>
   updateProject: (id: string, data: Partial<Project>) => Promise<void>
   deleteProject: (id: string) => Promise<void>
+  isOperationInProgress: (operation: string) => boolean
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
@@ -38,6 +39,8 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   async function updateProject(id: string, data: Partial<Project>) {
     try {
       const updatedProject = await api.updateProject(id, data)
+      if (!updatedProject) return // 如果操作已在进行中，直接返回
+      
       setProjects((prev) =>
         prev.map((project) =>
           project.id === id ? updatedProject : project
@@ -65,10 +68,17 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         description: t('common.projectDeleted'),
       })
     } catch (error) {
-      toast.error({
-        title: t('common.error'),
-        description: t('common.deleteProjectFailed'),
-      })
+      if (error instanceof Error) {
+        toast.error({
+          title: t('common.error'),
+          description: error.message,
+        })
+      } else {
+        toast.error({
+          title: t('common.error'),
+          description: t('common.deleteProjectFailed'),
+        })
+      }
       throw error
     }
   }
@@ -85,6 +95,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         refreshProjects,
         updateProject,
         deleteProject,
+        isOperationInProgress: api.isOperationInProgress,
       }}
     >
       {children}

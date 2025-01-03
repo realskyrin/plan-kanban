@@ -1,20 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { ProjectStatus } from "@prisma/client"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/lib/toast"
-import { ToastAction } from "@/components/ui/toast"
 import {
   Select,
   SelectContent,
@@ -23,71 +21,66 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useTranslation } from "react-i18next"
+import { useProject } from "@/components/providers/project-provider"
 
 interface Project {
   id: string
   title: string
   description: string
-  status: "ACTIVE" | "COMPLETED" | "ARCHIVED"
+  status: ProjectStatus
   createdAt: string
   updatedAt: string
 }
 
 interface EditProjectDialogProps {
+  project: {
+    id: string
+    title: string
+    description: string
+    createdAt: string
+    updatedAt: string
+    status: ProjectStatus
+  }
+  onProjectUpdated: (projectId: string, updatedData: Partial<Project>) => Promise<void>
   open: boolean
   onOpenChange: (open: boolean) => void
-  project: Project
-  onProjectUpdated: (projectId: string, updatedData: Partial<Project>) => Promise<void>
 }
 
 export function EditProjectDialog({
-  open,
-  onOpenChange,
   project,
   onProjectUpdated,
+  open,
+  onOpenChange,
 }: EditProjectDialogProps) {
   const { t } = useTranslation()
-  
-  const statusOptions = [
-    { value: "ACTIVE", label: t('common.inProgress') },
-    { value: "COMPLETED", label: t('common.completed') },
-    { value: "ARCHIVED", label: t('common.archived') },
-  ] as const
+  const { isOperationInProgress } = useProject()
+  const [title, setTitle] = useState(project.title)
+  const [description, setDescription] = useState(project.description)
+  const [status, setStatus] = useState<ProjectStatus>(project.status)
 
-  const [form, setForm] = useState<{
-    title: string
-    description: string
-    status: "ACTIVE" | "COMPLETED" | "ARCHIVED"
-  }>({
-    title: project.title,
-    description: project.description,
-    status: project.status,
-  })
+  const isUpdating = isOperationInProgress('updateProject')
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    if (open) {
+      setTitle(project.title)
+      setDescription(project.description)
+      setStatus(project.status)
+    }
+  }, [open, project])
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (isUpdating) return
+
     try {
       await onProjectUpdated(project.id, {
-        ...form,
-        updatedAt: new Date().toISOString(),
+        title,
+        description,
+        status,
       })
       onOpenChange(false)
     } catch (error) {
-      const errorMessage = process.env.DEBUG_PROD === 'true'
-        ? `更新项目失败: ${error instanceof Error ? error.message : t('common.unknownError')}`
-        : t('common.updateProjectFailed')
-
-      toast.custom({
-        title: t('common.error'),
-        description: errorMessage,
-        variant: "destructive",
-        action: process.env.DEBUG_PROD === 'true' ? (
-          <ToastAction altText={t('common.copyErrorInfo')} onClick={() => {
-            navigator.clipboard.writeText(String(error))
-          }}>
-            {t('common.copyErrorInfo')}
-          </ToastAction>
-        ) : undefined
-      })
+      console.error('Failed to update project:', error)
     }
   }
 
@@ -95,62 +88,60 @@ export function EditProjectDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('common.editProject')}</DialogTitle>
-          <DialogDescription>
-            {t('common.modifyProjectInfo')}
-          </DialogDescription>
+          <DialogTitle>{t('project.editProject')}</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="title">{t('common.projectName')}</Label>
-            <Input
-              id="title"
-              value={form.title}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, title: e.target.value }))
-              }
-            />
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title">{t('common.title')}</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                disabled={isUpdating}
+              />
+            </div>
+            <div>
+              <Label htmlFor="description">{t('common.description')}</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                disabled={isUpdating}
+              />
+            </div>
+            <div>
+              <Label htmlFor="status">{t('common.status')}</Label>
+              <Select
+                value={status}
+                onValueChange={(value) => setStatus(value as ProjectStatus)}
+                disabled={isUpdating}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">{t('common.inProgress')}</SelectItem>
+                  <SelectItem value="COMPLETED">{t('common.completed')}</SelectItem>
+                  <SelectItem value="ARCHIVED">{t('common.archived')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="description">{t('common.projectDescription')}</Label>
-            <Textarea
-              id="description"
-              value={form.description}
-              onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="status">{t('common.projectStatus')}</Label>
-            <Select
-              value={form.status}
-              onValueChange={(value: "ACTIVE" | "COMPLETED" | "ARCHIVED") =>
-                setForm((prev) => ({ ...prev, status: value }))
-              }
+          <DialogFooter className="mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isUpdating}
             >
-              <SelectTrigger>
-                <SelectValue placeholder={t('common.selectStatus')} />
-              </SelectTrigger>
-              <SelectContent>
-                {statusOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common.cancel')}
-          </Button>
-          <Button onClick={handleSubmit}>{t('common.save')}</Button>
-        </DialogFooter>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" disabled={isUpdating}>
+              {isUpdating ? t('common.updating') : t('common.save')}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )
