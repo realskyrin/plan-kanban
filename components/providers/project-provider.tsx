@@ -92,7 +92,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
         description: t('common.initialProjectLoadFailed'),
       })
     })
-  }, [t])
+  }, [])
 
   return (
     <ProjectContext.Provider

@@ -34,6 +34,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const { fireConfetti } = useConfetti()
   const deleteTimeoutRef = useRef<number>()
   const taskRef = useRef<Task | null>(null)
+  const mountedRef = useRef(false)
 
   const columns = {
     TODO: {
@@ -56,7 +57,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     },
   }
 
-  async function fetchTasks() {
+  const fetchTasks = useCallback(async () => {
     try {
       const response = await fetch(`/api/tasks?projectId=${projectId}`)
       const data = await response.json()
@@ -70,11 +71,14 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [projectId])
 
   useEffect(() => {
-    fetchTasks()
-  }, [projectId])
+    if (!mountedRef.current) {
+      mountedRef.current = true
+      fetchTasks()
+    }
+  }, [fetchTasks])
 
   const handleRestore = useCallback(() => {
     console.log('Restore clicked', { taskRef: taskRef.current, timeoutRef: deleteTimeoutRef.current })
