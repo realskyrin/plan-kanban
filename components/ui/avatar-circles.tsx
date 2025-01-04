@@ -59,7 +59,7 @@ const AvatarCircles = ({
               className="flex items-center justify-center rounded-full border-2 border-white bg-gray-100 dark:border-gray-800 dark:bg-gray-700"
               style={{ width: size, height: size }}
             >
-              <span className="text-sm font-medium">
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 {getInitials(avatar.name)}
               </span>
             </div>
@@ -68,7 +68,7 @@ const AvatarCircles = ({
       ))}
       {(numPeople ?? 0) > 0 && (
         <a
-          className="flex items-center justify-center rounded-full border-2 border-white bg-black text-center text-xs font-medium text-white hover:bg-gray-600 dark:border-gray-800 dark:bg-white dark:text-black"
+          className="flex items-center justify-center rounded-full border-2 border-white bg-black text-center text-xs font-medium text-white hover:bg-gray-600 dark:border-gray-800 dark:bg-white dark:text-black default:border-gray-800 default:bg-white default:text-black"
           style={{ width: size, height: size }}
           href="#"
         >

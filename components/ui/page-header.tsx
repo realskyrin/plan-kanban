@@ -83,7 +83,7 @@ export function PageHeader({
 }
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { setTheme } = useTheme()
   const { t } = useTranslation()
 
   return (
