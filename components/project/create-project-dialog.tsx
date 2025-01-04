@@ -41,7 +41,7 @@ interface CreateProjectDialogProps {
   children?: React.ReactNode
 }
 
-export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
+export function CreateProjectDialog({ }: CreateProjectDialogProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { refreshProjects } = useProject()
@@ -59,6 +59,16 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
         title: values.title,
         description: values.description || "",
         status: "ACTIVE",
+        ownerId: "",
+        owner: {
+          id: "",
+          name: "",
+          email: ""
+        },
+        members: [],
+        _count: {
+          tasks: 0
+        }
       })
       toast.success({
         title: t('common.success'),
@@ -68,6 +78,7 @@ export function CreateProjectDialog({ children }: CreateProjectDialogProps) {
       setOpen(false)
       refreshProjects()
     } catch (error) {
+      console.error(error)
       toast.error({
         title: t('common.error'),
         description: t('common.projectCreationFailed'),

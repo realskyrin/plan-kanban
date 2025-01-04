@@ -117,7 +117,7 @@ export function ProjectCard({ project, onDeleted }: ProjectCardProps) {
     if (target.closest('.dropdown-trigger') || target.closest('[role="menu"]')) {
       return
     }
-    router.push(`/projects/${projectData.id}`)
+    router.push(`/project/${projectData.id}?title=${encodeURIComponent(projectData.title)}`)
   }
 
   const statusMap: Record<ProjectStatus, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {

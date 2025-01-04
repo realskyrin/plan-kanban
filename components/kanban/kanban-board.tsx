@@ -62,6 +62,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
       const data = await response.json()
       setTasks(data.filter((task: Task | null): task is Task => task !== null))
     } catch (error) {
+      console.error(error)
       toast.error({
         title: t('common.error'),
         description: t('common.getTaskListFailed'),
@@ -271,6 +272,7 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         task.id === draggableId ? updatedTask : task
       ))
     } catch (error) {
+      console.error(error)
       // 回滚到原始状态
       setTasks((prev) => prev.map((task) =>
         task.id === draggableId

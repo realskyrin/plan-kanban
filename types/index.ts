@@ -5,6 +5,23 @@ export interface Project {
   status: "ACTIVE" | "COMPLETED" | "ARCHIVED"
   createdAt: string
   updatedAt: string
+  ownerId: string
+  owner: {
+    id: string
+    name: string
+    email: string
+  }
+  members: {
+    role: 'OWNER' | 'EDITOR' | 'VIEWER'
+    user: {
+      id: string
+      name: string
+      email: string
+    }
+  }[]
+  _count: {
+    tasks: number
+  }
 }
 
 export interface Task {
