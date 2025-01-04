@@ -82,7 +82,8 @@
     "updating": "更新中...",
     "deleting": "删除中...",
     "saving": "保存中...",
-    "processing": "处理中..."
+    "processing": "处理中...",
+    "noProjectAccess": "您没有访问该项目的权限"
   },
   "nav": {
     "home": "首页",

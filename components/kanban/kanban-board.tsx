@@ -9,6 +9,9 @@ import { cn } from "@/lib/utils"
 import { Trash2 } from "lucide-react"
 import { ToastAction } from "@/components/ui/toast"
 import { useTranslation } from "react-i18next"
+import { useRouter } from "next/navigation"
+import { useProject } from "@/components/providers/project-provider"
+import { useAuth } from "@/components/providers/auth-provider"
 
 interface Task {
   id: string
@@ -28,6 +31,8 @@ interface KanbanBoardProps {
 
 export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const { t } = useTranslation()
+  const router = useRouter()
+  const { user } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
@@ -35,6 +40,47 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
   const deleteTimeoutRef = useRef<number>()
   const taskRef = useRef<Task | null>(null)
   const mountedRef = useRef(false)
+
+  const fetchTasks = async () => {
+    try {
+      const response = await fetch(`/api/tasks?projectId=${projectId}`)
+      const data = await response.json()
+      setTasks(data.filter((task: Task | null): task is Task => task !== null))
+    } catch (error) {
+      console.error(error)
+      toast.error({
+        title: t('common.error'),
+        description: t('common.getTaskListFailed'),
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const response = await fetch(`/api/projects/${projectId}/check-access`)
+        if (!response.ok) {
+          throw new Error('No access')
+        }
+        
+        if (!mountedRef.current) {
+          mountedRef.current = true
+          fetchTasks()
+        }
+      } catch (error) {
+        console.error('Access check failed:', error)
+        toast.error({
+          title: t('common.error'),
+          description: t('common.noProjectAccess')
+        })
+        router.push('/')
+      }
+    }
+
+    checkAccess()
+  }, [])
 
   const columns = {
     TODO: {
@@ -56,29 +102,6 @@ export function KanbanBoard({ projectId }: KanbanBoardProps) {
         .sort((a, b) => a.order - b.order),
     },
   }
-
-  const fetchTasks = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/tasks?projectId=${projectId}`)
-      const data = await response.json()
-      setTasks(data.filter((task: Task | null): task is Task => task !== null))
-    } catch (error) {
-      console.error(error)
-      toast.error({
-        title: t('common.error'),
-        description: t('common.getTaskListFailed'),
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }, [projectId])
-
-  useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true
-      fetchTasks()
-    }
-  }, [fetchTasks])
 
   const handleRestore = useCallback(() => {
     console.log('Restore clicked', { taskRef: taskRef.current, timeoutRef: deleteTimeoutRef.current })
