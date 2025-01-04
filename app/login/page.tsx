@@ -35,7 +35,7 @@ export default function LoginPage() {
       const from = searchParams.get('from') || '/'
       router.push(from)
     } catch (error) {
-      // 错误已在 AuthProvider 中处理
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false)
     }
@@ -98,4 +98,4 @@ export default function LoginPage() {
       </Card>
     </div>
   )
-} 
+}

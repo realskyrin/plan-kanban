@@ -28,6 +28,9 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          themes={['light', 'dark', 'default']}
+          forcedTheme={undefined}
+          storageKey="theme"
         >
           <AuthProvider>
             <I18nProvider>

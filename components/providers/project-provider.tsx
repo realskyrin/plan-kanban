@@ -27,6 +27,7 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       const data = await api.getProjects()
       setProjects(data)
     } catch (error) {
+      console.error('Failed to load projects:', error)
       toast.error({
         title: t('common.error'),
         description: t('common.getProjectListFailed'),
@@ -84,8 +85,14 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    refreshProjects()
-  }, [])
+    refreshProjects().catch((error) => {
+      console.error('Failed to load projects:', error)
+      toast.error({
+        title: t('common.error'),
+        description: t('common.initialProjectLoadFailed'),
+      })
+    })
+  }, [t])
 
   return (
     <ProjectContext.Provider
