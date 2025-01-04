@@ -77,7 +77,14 @@
     "pleaseEnterProjectName": "請輸入項目名稱",
     "toConfirmDelete": "以確認刪除",
     "logout": "登出",
-    "getTaskListFailed": "獲取任務列表失敗"
+    "getTaskListFailed": "獲取任務列表失敗",
+    "noProjects": "暫無項目",
+    "creating": "創建中...",
+    "updating": "更新中...",
+    "deleting": "刪除中...",
+    "saving": "保存中...",
+    "processing": "處理中...",
+    "noProjectAccess": "您沒有訪問該項目的權限"
   },
   "nav": {
     "home": "首頁",

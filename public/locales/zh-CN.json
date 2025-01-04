@@ -83,7 +83,8 @@
     "deleting": "删除中...",
     "saving": "保存中...",
     "processing": "处理中...",
-    "noProjectAccess": "您没有访问该项目的权限"
+    "noProjectAccess": "您没有访问该项目的权限",
+    "noProjects": "暂无项目"
   },
   "nav": {
     "home": "首页",

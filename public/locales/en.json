@@ -77,7 +77,14 @@
     "pleaseEnterProjectName": "Please enter project name",
     "toConfirmDelete": "to confirm deletion",
     "logout": "Logout",
-    "getTaskListFailed": "Failed to Get Task List"
+    "getTaskListFailed": "Failed to Get Task List",
+    "noProjects": "No projects found",
+    "creating": "Creating...",
+    "updating": "Updating...",
+    "deleting": "Deleting...",
+    "saving": "Saving...",
+    "processing": "Processing...",
+    "noProjectAccess": "You don't have access to this project"
   },
   "nav": {
     "home": "Home",
