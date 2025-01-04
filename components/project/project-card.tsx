@@ -1,6 +1,6 @@
 "use client"
 
-import { Project, Prisma } from '@prisma/client'
+import { Project } from '@prisma/client'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'

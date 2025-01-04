@@ -50,7 +50,6 @@ export function ProjectList({
               createdAt: new Date(project.createdAt),
               updatedAt: new Date(project.updatedAt)
             }}
-            onDeleted={() => onDeleteProject(project.id)}
           />
         ))}
         <CreateProjectDialog>
@@ -61,4 +60,4 @@ export function ProjectList({
       </div>
     </div>
   )
-} 
+}
