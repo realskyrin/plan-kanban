@@ -113,7 +113,13 @@
     "memberRemoved": "成員已移除",
     "setAsEditor": "設為編輯者",
     "setAsViewer": "設為查看者",
-    "removeMember": "移除成員"
+    "removeMember": "移除成員",
+    "loading": "載入中",
+    "project_loading": "專案載入中...",
+    "error": "錯誤",
+    "retry": "重試",
+    "project_not_found": "未找到專案",
+    "project_data_loading_failed": "專案數據載入失敗"
   },
   "board": {
     "addCard": "添加卡片",
@@ -126,7 +132,29 @@
     "updateSuccess": "卡片更新成功"
   },
   "error": {
+    "error": "錯誤",
+    "sorry_something_went_wrong": "抱歉，出現了一些問題",
+    "retry": "重試",
     "languageSwitch": "切換語言失敗",
     "tryAgain": "請稍後重試"
+  },
+  "login": {
+    "login": "登入",
+    "enter_your_email_and_password_to_login": "請輸入郵箱和密碼登入",
+    "email": "郵箱",
+    "password": "密碼",
+    "logging_in": "登入中...",
+    "no_account": "還沒有帳號？",
+    "register": "註冊"
+  },
+  "register": {
+    "register": "註冊",
+    "create_your_account": "創建你的帳號",
+    "email": "郵箱",
+    "name": "姓名",
+    "password": "密碼",
+    "registering": "註冊中...",
+    "have_an_account": "已有帳號？",
+    "login": "登入"
   }
 } 

@@ -118,7 +118,13 @@
     "memberRemoved": "成员已移除",
     "setAsEditor": "设为编辑者",
     "setAsViewer": "设为查看者",
-    "removeMember": "移除成员"
+    "removeMember": "移除成员",
+    "loading": "加载中",
+    "project_loading": "项目加载中...",
+    "error": "错误",
+    "retry": "重试",
+    "project_not_found": "未找到项目",
+    "project_data_loading_failed": "项目数据加载失败"
   },
   "board": {
     "addCard": "添加卡片",
@@ -131,7 +137,29 @@
     "updateSuccess": "卡片更新成功"
   },
   "error": {
+    "error": "错误",
+    "sorry_something_went_wrong": "抱歉，出现了一些问题",
+    "retry": "重试",
     "languageSwitch": "切换语言失败",
     "tryAgain": "请稍后重试"
+  },
+  "login": {
+    "login": "登录",
+    "enter_your_email_and_password_to_login": "请输入邮箱和密码登录",
+    "email": "邮箱",
+    "password": "密码",
+    "logging_in": "登录中...",
+    "no_account": "还没有账号？",
+    "register": "注册"
+  },
+  "register": {
+    "register": "注册",
+    "create_your_account": "创建你的账号",
+    "email": "邮箱",
+    "name": "姓名",
+    "password": "密码",
+    "registering": "注册中...",
+    "have_an_account": "已有账号？",
+    "login": "登录"
   }
 } 

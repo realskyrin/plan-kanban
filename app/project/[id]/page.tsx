@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 import { Project } from "@/types"
 import { PageHeader } from "@/components/ui/page-header"
 import { useSearchParams } from "next/navigation"
+import { useTranslation } from 'react-i18next'
 
 interface PageProps {
   params: {
@@ -17,6 +18,7 @@ interface PageProps {
 }
 
 export default function ProjectPage({ params }: PageProps) {
+  const { t } = useTranslation()
   const { projects, refreshProjects } = useProject()
   const searchParams = useSearchParams()
   const [project, setProject] = useState<Project | null>(null)
@@ -41,7 +43,7 @@ export default function ProjectPage({ params }: PageProps) {
         )
 
         if (!currentProject) {
-          setError("未找到该项目")
+          setError(t('project.project_not_found'))
           setProject(null)
           return
         }
@@ -56,7 +58,7 @@ export default function ProjectPage({ params }: PageProps) {
         setError(null)
       } catch (error) {
         console.error('Failed to load project:', error)
-        setError("项目数据加载失败")
+        setError(t('project.project_data_loading_failed'))
         setProject(null)
       } finally {
         setIsLoading(false)
@@ -74,7 +76,7 @@ export default function ProjectPage({ params }: PageProps) {
     return (
       <div className="flex-1">
         <PageHeader
-          title="加载中..."
+          title={t('project.loading')}
           showBack
         >
           <Button variant="ghost" size="icon" asChild className="h-9 w-9">
@@ -84,7 +86,7 @@ export default function ProjectPage({ params }: PageProps) {
           </Button>
         </PageHeader>
         <div className="flex items-center justify-center h-[calc(100vh-3.5rem)] pt-14">
-          <p className="text-muted-foreground">项目加载中...</p>
+          <p className="text-muted-foreground">{t('project.project_loading')}</p>
         </div>
       </div>
     )
@@ -94,7 +96,7 @@ export default function ProjectPage({ params }: PageProps) {
     return (
       <div className="flex-1">
         <PageHeader
-          title="错误"
+          title={t('project.error')}
           showBack
         >
           <Button variant="ghost" size="icon" asChild className="h-9 w-9">
@@ -111,7 +113,7 @@ export default function ProjectPage({ params }: PageProps) {
             className="gap-2"
           >
             <RefreshCcw className="h-4 w-4" />
-            重试
+            {t('project.retry')}
           </Button>
         </div>
       </div>
@@ -122,7 +124,7 @@ export default function ProjectPage({ params }: PageProps) {
     return (
       <div className="flex-1">
         <PageHeader
-          title="项目不存在"
+          title={t('project.project_not_found')}
           showBack
         >
           <Button variant="ghost" size="icon" asChild className="h-9 w-9">
@@ -132,14 +134,14 @@ export default function ProjectPage({ params }: PageProps) {
           </Button>
         </PageHeader>
         <div className="flex flex-col items-center justify-center gap-4 h-[calc(100vh-3.5rem)] pt-14">
-          <p className="text-muted-foreground">未找到该项目</p>
+          <p className="text-muted-foreground">{t('project.project_not_found')}</p>
           <Button 
             variant="outline" 
             onClick={handleRetry}
             className="gap-2"
           >
             <RefreshCcw className="h-4 w-4" />
-            重试
+            {t('project.retry')}
           </Button>
         </div>
       </div>

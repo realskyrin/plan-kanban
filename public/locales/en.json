@@ -113,7 +113,13 @@
     "memberRemoved": "Member Removed",
     "setAsEditor": "Set as Editor",
     "setAsViewer": "Set as Viewer",
-    "removeMember": "Remove Member"
+    "removeMember": "Remove Member",
+    "loading": "Loading",
+    "project_loading": "Project loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "project_not_found": "Project not found",
+    "project_data_loading_failed": "Failed to load project data"
   },
   "board": {
     "addCard": "Add Card",
@@ -126,7 +132,29 @@
     "updateSuccess": "Card updated successfully"
   },
   "error": {
+    "error": "Error",
+    "sorry_something_went_wrong": "Sorry, something went wrong",
+    "retry": "Retry",
     "languageSwitch": "Failed to switch language",
     "tryAgain": "Please try again later"
+  },
+  "login": {
+    "login": "Login",
+    "enter_your_email_and_password_to_login": "Enter your email and password to login",
+    "email": "Email",
+    "password": "Password",
+    "logging_in": "Logging in...",
+    "no_account": "Don't have an account?",
+    "register": "Register"
+  },
+  "register": {
+    "register": "Register",
+    "create_your_account": "Create your account",
+    "email": "Email",
+    "name": "Name",
+    "password": "Password",
+    "registering": "Registering...",
+    "have_an_account": "Already have an account?",
+    "login": "Login"
   }
 } 
