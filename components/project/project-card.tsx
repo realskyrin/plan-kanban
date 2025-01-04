@@ -69,7 +69,6 @@ export function ProjectCard({ project, onDeleted }: ProjectCardProps) {
   const [deleteConfirmName, setDeleteConfirmName] = useState('')
 
   const isDeleting = isOperationInProgress('deleteProject')
-  const isUpdating = isOperationInProgress('updateProject')
 
   const userRole = projectData.members.find(m => m.user.id === user?.id)?.role
   const canEdit = userRole === 'OWNER' || userRole === 'EDITOR'
@@ -226,7 +225,6 @@ export function ProjectCard({ project, onDeleted }: ProjectCardProps) {
         }}
         open={showEditDialog}
         onOpenChange={setShowEditDialog}
-        isUpdating={isUpdating}
       />
 
       <ProjectMembersDialog

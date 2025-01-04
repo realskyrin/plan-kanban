@@ -6,7 +6,6 @@ import { I18nProvider } from '@/components/providers/i18n-provider'
 import { AuthProvider } from '@/components/providers/auth-provider'
 import { ProjectProvider } from '@/components/providers/project-provider'
 import { ThemeProvider } from 'next-themes'
-import { PageHeader } from '@/components/ui/page-header'
 
 const inter = Inter({ subsets: ['latin'] })
 
