@@ -88,12 +88,12 @@ export function EditProjectDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('project.editProject')}</DialogTitle>
+          <DialogTitle>{t('common.editProject')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="title">{t('common.title')}</Label>
+              <Label htmlFor="title">{t('common.projectName')}</Label>
               <Input
                 id="title"
                 value={title}
@@ -102,7 +102,7 @@ export function EditProjectDialog({
               />
             </div>
             <div>
-              <Label htmlFor="description">{t('common.description')}</Label>
+              <Label htmlFor="description">{t('common.projectDescription')}</Label>
               <Textarea
                 id="description"
                 value={description}
@@ -111,7 +111,7 @@ export function EditProjectDialog({
               />
             </div>
             <div>
-              <Label htmlFor="status">{t('common.status')}</Label>
+              <Label htmlFor="status">{t('common.projectStatus')}</Label>
               <Select
                 value={status}
                 onValueChange={(value) => setStatus(value as ProjectStatus)}
