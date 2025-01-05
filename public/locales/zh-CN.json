@@ -96,6 +96,7 @@
     "projectName": "项目名称",
     "description": "描述",
     "noProjects": "暂无项目",
+    "deleteProject": "删除项目",
     "deleteConfirm": "确定要删除这个项目吗？",
     "createSuccess": "项目创建成功",
     "deleteSuccess": "项目删除成功",

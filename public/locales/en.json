@@ -96,6 +96,7 @@
     "projectName": "Project Name",
     "description": "Description",
     "noProjects": "No projects found",
+    "deleteProject": "Delete Project",
     "deleteConfirm": "Are you sure you want to delete this project?",
     "createSuccess": "Project created successfully",
     "deleteSuccess": "Project deleted successfully",
