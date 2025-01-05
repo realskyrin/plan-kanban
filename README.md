@@ -51,18 +51,18 @@ yarn install
 pnpm install
 ```
 
-3. 初始化数据库
-
-```bash
-npx prisma migrate dev --name init
-```
-
-4. 环境配置
+3. 环境配置
 
 复制 `.env.example` 文件为 `.env`，并配置以下必要环境变量：
 - DATABASE_URL: PostgreSQL 数据库连接字符串
 - JWT_SECRET: 用于生成和验证 JWT 的密钥
 - 其他必要的环境变量
+
+4. 初始化数据库
+
+```bash
+npx prisma migrate dev --name init
+```
 
 5. 启动开发服务器
 
