@@ -22,6 +22,7 @@ interface PageHeaderProps {
   className?: string
   children?: React.ReactNode
   showBack?: boolean
+  showAuthProfile?: boolean
 }
 
 export function PageHeader({
@@ -29,6 +30,7 @@ export function PageHeader({
   className,
   children,
   showBack,
+  showAuthProfile = true,
 }: PageHeaderProps) {
   const { theme, setTheme } = useTheme()
   const { t } = useTranslation()
@@ -50,7 +52,7 @@ export function PageHeader({
         <span className="sr-only">{t('common.github')}</span>
       </Button>
       <ThemeToggle />
-      {user && (
+      {showAuthProfile && user && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">

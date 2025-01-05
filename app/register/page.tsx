@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
+import { PageHeader } from "@/components/ui/page-header"
 
 export default function RegisterPage() {
   const { t } = useTranslation()
@@ -43,10 +44,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="container relative flex h-[calc(100vh-3.5rem)] flex-col items-center justify-center">
-      <Card className="w-full max-w-[350px]">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">{t('register.register')}</CardTitle>
+    <>
+      <PageHeader showAuthProfile={false} />
+      <div className="container relative flex h-[calc(100vh-3.5rem)] flex-col items-center justify-center">
+        <Card className="w-full max-w-[350px]"> 
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-center">{t('register.register')}</CardTitle>
           <CardDescription className="text-center">
             {t('register.create_your_account')}
           </CardDescription>
@@ -105,9 +108,10 @@ export default function RegisterPage() {
                 {t('register.login')}
               </Link>
             </div>
-          </CardFooter>
-        </form>
-      </Card>
-    </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+    </>
   )
 } 

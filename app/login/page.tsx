@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
+import { PageHeader } from "@/components/ui/page-header"
 
 export default function LoginPage() {
   const { t } = useTranslation()
@@ -44,7 +45,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="container relative flex h-[calc(100vh-3.5rem)] flex-col items-center justify-center">
+    <>
+      <PageHeader showAuthProfile={false} />
+      <div className="container relative flex h-[calc(100vh-3.5rem)] flex-col items-center justify-center">
         <Card className="w-full max-w-[350px]">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center">{t('login.login')}</CardTitle>
@@ -98,6 +101,7 @@ export default function LoginPage() {
             </CardFooter>
           </form>
         </Card>
-    </div>
+      </div>
+    </>
   )
 }
