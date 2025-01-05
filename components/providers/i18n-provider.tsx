@@ -1,42 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
 import i18n, { initI18n } from "@/lib/i18n";
 import { Loader2 } from "lucide-react";
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = useState(true);
+function I18nProviderContent({ children }: { children: React.ReactNode }) {
+  const [isI18nInitialized, setIsI18nInitialized] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const setupI18n = async () => {
+    const init = async () => {
       try {
-        await initI18n();
-        const savedLanguage = localStorage.getItem("preferredLanguage");
-        if (savedLanguage && ["en", "zh-CN", "zh-TW"].includes(savedLanguage)) {
-          await i18n.changeLanguage(savedLanguage);
-        } else {
-          const browserLang = navigator.language;
-          const lang = browserLang.startsWith("zh") 
-            ? browserLang.includes("TW") || browserLang.includes("HK") ? "zh-TW" : "zh-CN"
-            : "en";
-          await i18n.changeLanguage(lang);
-          localStorage.setItem("preferredLanguage", lang);
+        if (typeof window !== "undefined") {
+          await initI18n();
+          setIsI18nInitialized(true);
         }
       } catch (error) {
         console.error("Failed to initialize i18n:", error);
-        setError(error as Error);
-        await i18n.changeLanguage("en");
-      } finally {
-        setIsLoading(false);
+        setError(error instanceof Error ? error : new Error("Failed to initialize i18n"));
       }
     };
 
-    setupI18n();
+    if (!i18n.isInitialized) {
+      init();
+    } else {
+      setIsI18nInitialized(true);
+    }
+
+    return () => {
+      if (i18n.isInitialized) {
+        i18n.off("initialized");
+        i18n.off("languageChanged");
+        i18n.off("loaded");
+        i18n.off("failedLoading");
+      }
+    };
   }, []);
 
-  if (isLoading) {
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen text-red-500">
+        Error initializing translations: {error.message}
+      </div>
+    );
+  }
+
+  if (!isI18nInitialized) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -44,9 +54,19 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (error) {
-    return <div className="text-red-500">Error loading translations: {error.message}</div>;
-  }
+  return children;
+}
 
-  return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
-} 
+export function I18nProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <I18nextProvider i18n={i18n}>
+      <Suspense fallback={
+        <div className="flex items-center justify-center h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      }>
+        <I18nProviderContent>{children}</I18nProviderContent>
+      </Suspense>
+    </I18nextProvider>
+  );
+}

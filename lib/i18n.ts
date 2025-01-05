@@ -1,61 +1,90 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import Backend from "i18next-http-backend";
-import LanguageDetector from "i18next-browser-languagedetector";
 import { InitOptions } from "i18next";
 
+// 导入语言文件
+import en from '@/public/locales/en.json';
+import zhCN from '@/public/locales/zh-CN.json';
+import zhTW from '@/public/locales/zh-TW.json';
+
+const resources = {
+  en: { translation: en },
+  'zh-CN': { translation: zhCN },
+  'zh-TW': { translation: zhTW },
+};
+
 const i18nConfig: InitOptions = {
-  fallbackLng: "en",
-  supportedLngs: ["en", "zh", "zh-CN", "zh-TW"],
+  resources,
+  // 默认语言
+  fallbackLng: "zh-CN",
+  // 支持的语言列表
+  supportedLngs: ["en", "zh-CN", "zh-TW"],
+  // 命名空间
   ns: ["translation"],
   defaultNS: "translation",
+  // 开发环境下开启调试模式
   debug: process.env.NODE_ENV === "development",
+  // 插值设置
   interpolation: {
     escapeValue: false,
   },
-  backend: {
-    loadPath: "/locales/{{lng}}.json",
-  },
+  // 语言检测配置
   detection: {
-    order: ["querystring", "localStorage", "navigator"],
-    lookupQuerystring: "lang",
+    // 检测顺序：1.localStorage 2.浏览器语言 3.URL参数
+    order: ["localStorage", "navigator", "querystring"],
+    // URL参数名
+    lookupQuerystring: "lng",
+    lookupCookie: "i18next",
+    lookupLocalStorage: "preferredLanguage",
+    // 缓存配置
     caches: ["localStorage"],
   },
+  // React 配置
   react: {
-    useSuspense: false
+    useSuspense: true,
   },
-  saveMissing: true,
-  missingKeyHandler: (lng, ns, key) => {
-    if (process.env.NODE_ENV === "development") {
-      console.warn(`Missing translation key: ${key} for language: ${lng} in namespace: ${ns}`);
-    }
-  },
-  parseMissingKeyHandler: (key) => {
-    return key;
-  }
 };
 
 // 初始化i18n
 const initI18n = async () => {
-  await i18n
-    .use(Backend)
-    .use(LanguageDetector)
-    .use(initReactI18next)
-    .init(i18nConfig);
+  if (!i18n.isInitialized) {
+    try {
+      // 获取存储的首选语言
+      const storedLang = typeof window !== 'undefined' 
+        ? localStorage.getItem("preferredLanguage")
+        : null;
+      const defaultLang = storedLang || "zh-CN";
 
-  // 添加语言检测和映射逻辑
-  i18n.on("languageChanged", (lng) => {
-    if (lng.startsWith("zh")) {
-      const mappedLng = lng.includes("TW") || lng.includes("HK") ? "zh-TW" : "zh-CN";
-      if (lng !== mappedLng) {
-        i18n.changeLanguage(mappedLng);
-      }
+      await i18n
+        .use(initReactI18next)
+        .init({
+          ...i18nConfig,
+          lng: defaultLang, // 强制使用默认语言
+        });
+
+      // 添加语言变更监听和处理
+      i18n.on("initialized", () => {
+        console.log("i18n initialized with language:", i18n.language);
+      });
+
+      i18n.on("languageChanged", (lng) => {
+        console.log("Language changed to:", lng);
+        // 处理中文变体
+        if (lng.startsWith("zh")) {
+          const mappedLng = lng.includes("TW") || lng.includes("HK") ? "zh-TW" : "zh-CN";
+          if (lng !== mappedLng) {
+            i18n.changeLanguage(mappedLng);
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error("Failed to initialize i18n:", error);
+      throw error;
     }
-  });
-
+  }
   return i18n;
 };
 
-// 导出初始化函数和i18n实例
 export { initI18n };
-export default i18n; 
+export default i18n;

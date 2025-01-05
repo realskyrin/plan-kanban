@@ -45,59 +45,59 @@ export default function LoginPage() {
 
   return (
     <div className="container relative flex h-[calc(100vh-3.5rem)] flex-col items-center justify-center">
-      <Card className="w-full max-w-[350px]">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center">{t('login.login')}</CardTitle>
-          <CardDescription className="text-center">
-            {t('login.enter_your_email_and_password_to_login')}
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={onSubmit}>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">{t('login.email')}</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="name@example.com"
-                autoComplete="email"
-                required
+        <Card className="w-full max-w-[350px]">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-center">{t('login.login')}</CardTitle>
+            <CardDescription className="text-center">
+              {t('login.enter_your_email_and_password_to_login')}
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={onSubmit}>
+            <CardContent className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">{t('login.email')}</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  autoComplete="email"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">{t('login.password')}</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-4">
+              <Button
+                type="submit"
+                className="w-full"
                 disabled={isLoading}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">{t('login.password')}</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                disabled={isLoading}
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? t('login.logging_in') : t('login.login')}
-            </Button>
-            <div className="text-sm text-center text-muted-foreground">
-              {t('login.no_account')} {' '}
-              <Link
-                href="/register"
-                className="text-primary underline-offset-4 hover:underline"
               >
-                {t('login.register')}
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
+                {isLoading ? t('login.logging_in') : t('login.login')}
+              </Button>
+              <div className="text-sm text-center text-muted-foreground">
+                {t('login.no_account')} {' '}
+                <Link
+                  href="/register"
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  {t('login.register')}
+                </Link>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
     </div>
   )
 }
