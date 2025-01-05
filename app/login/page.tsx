@@ -46,7 +46,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <PageHeader showAuthProfile={false} />
+      <PageHeader title={t('app.title')} showAuthProfile={false} />
       <div className="container relative flex h-[calc(100vh-3.5rem)] flex-col items-center justify-center">
         <Card className="w-full max-w-[350px]">
           <CardHeader className="space-y-1">

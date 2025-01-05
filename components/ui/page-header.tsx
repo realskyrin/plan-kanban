@@ -32,7 +32,6 @@ export function PageHeader({
   showBack,
   showAuthProfile = true,
 }: PageHeaderProps) {
-  const { theme, setTheme } = useTheme()
   const { t } = useTranslation()
   const { user, logout } = useAuth()
 
@@ -85,29 +84,46 @@ export function PageHeader({
 }
 
 export function ThemeToggle() {
-  const { setTheme } = useTheme()
+  const { setTheme, theme } = useTheme()
   const { t } = useTranslation()
+
+  const themes = [
+    { value: "light", icon: <Sun className="h-4 w-4" />, label: t('common.themeLight') },
+    { value: "dark", icon: <Moon className="h-4 w-4" />, label: t('common.themeDark') },
+    { value: "default", icon: <Monitor className="h-4 w-4" />, label: t('common.themeDefault') },
+  ]
+  const currentTheme = theme
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9">
-          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:rotate-90 dark:scale-0" />
-          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <Monitor className="absolute h-4 w-4 rotate-90 scale-0 transition-all default:rotate-0 default:scale-100" />
+          {themes.map(({ value, icon }) => (
+            <span
+              key={value}
+              className={cn(
+                "absolute h-4 w-4",
+                value === "light" && "rotate-0 scale-100 transition-all dark:rotate-90 dark:scale-0",
+                value === "dark" && "rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100",
+                value === "default" && "rotate-90 scale-0 transition-all default:rotate-0 default:scale-100"
+              )}
+            >
+              {icon}
+            </span>
+          ))}
           <span className="sr-only">{t('common.toggleTheme')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          {t('common.themeLight')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          {t('common.themeDark')}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("default")}>
-          {t('common.themeDefault')}
-        </DropdownMenuItem>
+        {themes.map(({ value, label }) => (
+          <DropdownMenuItem
+            key={value}
+            onClick={() => setTheme(value)}
+            className={currentTheme === value ? "bg-accent" : ""}
+          >
+            {label}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )
