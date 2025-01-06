@@ -17,6 +17,8 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from "@/components/ui/page-header"
+import LoadingButton from '@/components/ui/loading-button'
+import { LogIn } from 'lucide-react'
 
 export default function LoginPage() {
   const { t } = useTranslation()
@@ -82,13 +84,14 @@ export default function LoginPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button
+              <LoadingButton
                 type="submit"
                 className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? t('login.logging_in') : t('login.login')}
-              </Button>
+                isLoading={isLoading}
+                text={t('login.login')}
+                loadingText={t('login.logging_in')}
+                icon={<LogIn className="mr-2 h-4 w-4" />}
+              />
               <div className="text-sm text-center text-muted-foreground">
                 {t('login.no_account')} {' '}
                 <Link

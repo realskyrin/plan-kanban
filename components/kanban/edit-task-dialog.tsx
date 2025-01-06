@@ -22,6 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import LoadingButton from "@/components/ui/loading-button"
+import { Save } from "lucide-react"
 
 interface Task {
   id: string
@@ -49,6 +51,7 @@ export function EditTaskDialog({
   onTaskUpdated,
 }: EditTaskDialogProps) {
   const { t } = useTranslation()
+  const [isLoading, setIsLoading] = useState(false)
   const [form, setForm] = useState<{
     title: string
     description: string | null
@@ -66,6 +69,7 @@ export function EditTaskDialog({
   ] as const
 
   const handleSubmit = async () => {
+    setIsLoading(true)
     try {
       const response = await fetch(`/api/tasks/${task.id}`, {
         method: "PATCH",
@@ -91,6 +95,8 @@ export function EditTaskDialog({
         title: t('common.error'),
         description: t('common.updateFailed'),
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -112,6 +118,7 @@ export function EditTaskDialog({
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, title: e.target.value }))
               }
+              disabled={isLoading}
             />
           </div>
           <div className="grid gap-2">
@@ -125,6 +132,7 @@ export function EditTaskDialog({
                   description: e.target.value || null,
                 }))
               }
+              disabled={isLoading}
             />
           </div>
           <div className="grid gap-2">
@@ -134,6 +142,7 @@ export function EditTaskDialog({
               onValueChange={(value: "LOW" | "MEDIUM" | "HIGH") =>
                 setForm((prev) => ({ ...prev, priority: value }))
               }
+              disabled={isLoading}
             >
               <SelectTrigger>
                 <SelectValue placeholder={t('common.selectPriority')} />
@@ -149,10 +158,20 @@ export function EditTaskDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit}>{t('common.save')}</Button>
+          <LoadingButton
+            onClick={handleSubmit}
+            isLoading={isLoading}
+            text={t('common.save')}
+            loadingText={t('common.updating')}
+            icon={<Save className="mr-2 h-4 w-4" />}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

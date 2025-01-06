@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { ProjectStatus } from '@prisma/client'
 import { Badge } from '@/components/ui/badge'
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal, Trash } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +32,7 @@ import { useAuth } from '@/components/providers/auth-provider'
 import { useProject } from '@/components/providers/project-provider'
 import { updateProject } from '@/lib/api'
 import { useTranslation } from 'react-i18next'
+import LoadingButton from '../ui/loading-button'
 
 interface ProjectWithDetails extends Project {
   _count: {
@@ -60,7 +61,7 @@ interface ProjectCardProps {
 export function ProjectCard({ project, onDeleted }: ProjectCardProps) {
   const router = useRouter()
   const { user } = useAuth()
-  const { deleteProject, isOperationInProgress } = useProject()
+  const { deleteProject } = useProject()
   const { t } = useTranslation()
   const [projectData, setProjectData] = useState<ProjectWithDetails>(project)
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -68,7 +69,7 @@ export function ProjectCard({ project, onDeleted }: ProjectCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [deleteConfirmName, setDeleteConfirmName] = useState('')
 
-  const isDeleting = isOperationInProgress('deleteProject')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const userRole = projectData.members.find(m => m.user.id === user?.id)?.role
   const canEdit = userRole === 'OWNER' || userRole === 'EDITOR'
@@ -98,13 +99,16 @@ export function ProjectCard({ project, onDeleted }: ProjectCardProps) {
       toast.error({ title: t('common.deleteNameMismatch') })
       return
     }
-
+    
+    setIsDeleting(true)
     try {
       await deleteProject(projectData.id)
       setShowDeleteDialog(false)
       onDeleted?.()
     } catch (error) {
       console.error('Failed to delete project:', error)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -267,17 +271,16 @@ export function ProjectCard({ project, onDeleted }: ProjectCardProps) {
             >
               {t('common.cancel')}
             </Button>
-            <Button
+            <LoadingButton
+              type="submit"
               variant="destructive"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                handleDelete()
-              }}
+              onClick={handleDelete}
+              isLoading={isDeleting}
               disabled={isDeleting || deleteConfirmName !== projectData.title}
-            >
-              {isDeleting ? t('common.deleting') : t('common.delete')}
-            </Button>
+              text={t('common.delete')}
+              loadingText={t('common.deleting')}
+              icon={<Trash className="mr-2 h-4 w-4" />}
+            />
           </DialogFooter>
         </DialogContent>
       </Dialog>

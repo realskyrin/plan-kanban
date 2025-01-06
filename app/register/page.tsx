@@ -17,6 +17,8 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useTranslation } from 'react-i18next'
 import { PageHeader } from "@/components/ui/page-header"
+import LoadingButton from '@/components/ui/loading-button'
+import { UserPlus } from 'lucide-react'
 
 export default function RegisterPage() {
   const { t } = useTranslation()
@@ -29,9 +31,9 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     const formData = new FormData(event.currentTarget)
-    const email = formData.get('register.email') as string
-    const password = formData.get('register.password') as string
-    const name = formData.get('register.name') as string
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
+    const name = formData.get('name') as string
 
     try {
       await register(email, password, name)
@@ -92,13 +94,14 @@ export default function RegisterPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
-            <Button
+            <LoadingButton
               type="submit"
               className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? t('register.registering') : t('register.register')}
-            </Button>
+              isLoading={isLoading}
+              text={t('register.register')}
+              loadingText={t('register.registering')}
+              icon={<UserPlus className="mr-2 h-4 w-4" />}
+            />
             <div className="text-sm text-center text-muted-foreground">
               {t('register.have_an_account')} {' '}
               <Link

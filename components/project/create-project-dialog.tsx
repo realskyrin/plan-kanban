@@ -29,6 +29,7 @@ import { Plus } from "lucide-react"
 import { useState } from "react"
 import { useProject } from "@/components/providers/project-provider"
 import { useTranslation } from "react-i18next"
+import LoadingButton from "@/components/ui/loading-button"
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -143,7 +144,13 @@ export function CreateProjectDialog({ }: CreateProjectDialogProps) {
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 {t('common.cancel')}
               </Button>
-              <Button type="submit">{t('common.createProject')}</Button>
+              <LoadingButton 
+                type="submit"
+                text={t('common.create')}
+                loadingText={t('common.creating')}
+                isLoading={form.formState.isSubmitting}
+                icon={<Plus className="mr-2 h-4 w-4" />}
+              />
             </div>
           </form>
         </Form>

@@ -21,7 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useTranslation } from "react-i18next"
-import { useProject } from "@/components/providers/project-provider"
+import LoadingButton from "@/components/ui/loading-button"
+import { Save } from "lucide-react"
 
 interface Project {
   id: string
@@ -53,12 +54,11 @@ export function EditProjectDialog({
   onOpenChange,
 }: EditProjectDialogProps) {
   const { t } = useTranslation()
-  const { isOperationInProgress } = useProject()
   const [title, setTitle] = useState(project.title)
   const [description, setDescription] = useState(project.description)
   const [status, setStatus] = useState<ProjectStatus>(project.status)
 
-  const isUpdating = isOperationInProgress('updateProject')
+  const [isUpdating, setIsUpdating] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -71,7 +71,7 @@ export function EditProjectDialog({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (isUpdating) return
-
+    setIsUpdating(true)
     try {
       await onProjectUpdated(project.id, {
         title,
@@ -81,6 +81,8 @@ export function EditProjectDialog({
       onOpenChange(false)
     } catch (error) {
       console.error('Failed to update project:', error)
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -137,9 +139,13 @@ export function EditProjectDialog({
             >
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={isUpdating}>
-              {isUpdating ? t('common.updating') : t('common.save')}
-            </Button>
+            <LoadingButton
+              type="submit"
+              isLoading={isUpdating}
+              text={t('common.save')}
+              loadingText={t('common.updating')}
+              icon={<Save className="mr-2 h-4 w-4" />}
+            />
           </DialogFooter>
         </form>
       </DialogContent>
